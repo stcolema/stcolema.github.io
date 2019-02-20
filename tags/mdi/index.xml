@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Posts on Stats</title>
-    <link>/post/</link>
-    <description>Recent content in Posts on Stats</description>
+    <title>Mdi on Stats</title>
+    <link>/tags/mdi/</link>
+    <description>Recent content in Mdi on Stats</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-uk</language>
     <lastBuildDate>Wed, 20 Feb 2019 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="/tags/mdi/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
