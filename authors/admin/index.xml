@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>admin on Academic</title>
+    <link>/authors/admin/</link>
+    <description>Recent content in admin on Academic</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-uk</language>
+    
+	<atom:link href="/authors/admin/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title></title>
+      <link>/author/admin/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/author/admin/</guid>
+      <description>My research interests include Bayesian clustering applied to &amp;lsquo;omics data to extract biological information. Within &amp;lsquo;omics we have huge quantities of data; interpreting this and creating a coherent story of disease is a non-tirivial problem. My aim is to use Bayesian clustering methods (particularly non-parametric methods) in the area of immunology to help contribute to the understanding of disease.
+Previously I have worked with Paul Kirk, Laurent Gatto and Ollie Crook to extend Multiple Dataset Integration (MDI), an unsupervised clustering method based upon Dirichlet processes, to a semi-supervised predictive tool in spatial proetomics.</description>
+    </item>
+    
+  </channel>
+</rss>
