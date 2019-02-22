@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Tags on Stats</title>
+    <title>Tags on A Hugo website</title>
     <link>/tags/</link>
-    <description>Recent content in Tags on Stats</description>
+    <description>Recent content in Tags on A Hugo website</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-uk</language>
     <lastBuildDate>Wed, 20 Feb 2019 00:00:00 +0000</lastBuildDate>
@@ -30,11 +30,11 @@
     </item>
     
     <item>
-      <title>Mdi Paul Kirk</title>
-      <link>/tags/mdi-paul-kirk/</link>
+      <title>Paul Kirk</title>
+      <link>/tags/paul-kirk/</link>
       <pubDate>Tue, 19 Feb 2019 00:00:00 +0000</pubDate>
       
-      <guid>/tags/mdi-paul-kirk/</guid>
+      <guid>/tags/paul-kirk/</guid>
       <description></description>
     </item>
     
