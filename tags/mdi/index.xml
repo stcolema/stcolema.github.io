@@ -6,10 +6,21 @@
     <description>Recent content in MDI on An Rí Rua</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-uk</language>
-    <lastBuildDate>Wed, 20 Feb 2019 00:00:00 +0000</lastBuildDate>
+    <copyright>UA-135362222-1</copyright>
+    <lastBuildDate>Mon, 04 Mar 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/tags/mdi/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>MDI: Week 4</title>
+      <link>/post/mdi-week-4/</link>
+      <pubDate>Mon, 04 Mar 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/post/mdi-week-4/</guid>
+      <description>Sensible Clustering We check if the modal cluster from the MDI iterations is a sensible decision for allocating probes (note: we referred to median clustering previously. This was wrong). To do this we construct heatmaps comparing the clustering across a sample of iterations and also plot the adjusted Rand index for the clustering at every iteration compared to the modal clustering.
+ We plot the adjusted Rand index comparing the allocation at a given iteration (corrected for thinning on the x-axis) to the modal clustering from all recorded iterations.</description>
+    </item>
     
     <item>
       <title>MDI: Weeks 1 - 3</title>
