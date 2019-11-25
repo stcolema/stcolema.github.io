@@ -1,44 +1,73 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Paul Kirk on An Rí Rua</title>
+    <title>Paul Kirk | An Rí Rua</title>
     <link>/tags/paul-kirk/</link>
-    <description>Recent content in Paul Kirk on An Rí Rua</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <language>en-uk</language>
-    <copyright>UA-135362222-1</copyright>
-    <lastBuildDate>Wed, 15 May 2019 00:00:00 +0000</lastBuildDate>
-    
-	<atom:link href="/tags/paul-kirk/index.xml" rel="self" type="application/rss+xml" />
-    
-    
-    <item>
-      <title>MDI Weeks 10 - 14</title>
-      <link>/post/weeks-10-14/mdi-weeks-10-14/</link>
-      <pubDate>Wed, 15 May 2019 00:00:00 +0000</pubDate>
-      
-      <guid>/post/weeks-10-14/mdi-weeks-10-14/</guid>
-      <description>Summary This period has been a bit strange - the Easter bank holiday, MASAMB and a wedding in Ireland saw a number of days lost for MDI work (approximately 10). What have we done in this period:
-Run MATLAB MDI on the small gene sets (n = 102 probes) across 7 key datasets (we dropped CD15 and PLA); Ran Many seeds MDI (this is Mason’s implementation using multiple start points) on the same data; and Inspected and compared outputs.</description>
-    </item>
-    
-    <item>
-      <title>MDI: Week 4</title>
-      <link>/post/week-4/mdi-week-4/</link>
-      <pubDate>Mon, 04 Mar 2019 00:00:00 +0000</pubDate>
-      
-      <guid>/post/week-4/mdi-week-4/</guid>
-      <description>Sensible Clustering We check if the modal cluster from the MDI iterations is a sensible decision for allocating probes (note: we referred to median clustering previously. This was wrong). To do this we construct heatmaps comparing the clustering across a sample of iterations and also plot the adjusted Rand index for the clustering at every iteration compared to the modal clustering.
- We plot the adjusted Rand index comparing the allocation at a given iteration (corrected for thinning on the x-axis) to the modal clustering from all recorded iterations.</description>
-    </item>
+      <atom:link href="/tags/paul-kirk/index.xml" rel="self" type="application/rss+xml" />
+    <description>Paul Kirk</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>UA-135362222-1</copyright><lastBuildDate>Tue, 19 Feb 2019 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>/img/icon-192.png</url>
+      <title>Paul Kirk</title>
+      <link>/tags/paul-kirk/</link>
+    </image>
     
     <item>
       <title>An introduction to MDI</title>
       <link>/post/intro-mdi/an-introduction-to-mdi/</link>
       <pubDate>Tue, 19 Feb 2019 00:00:00 +0000</pubDate>
-      
       <guid>/post/intro-mdi/an-introduction-to-mdi/</guid>
-      <description>Multiple Dataset Integration If we have observed paired datasets \(X_1=(x_{1,1},\ldots, x_{n,1})\), \(X_2=(x_{1,2},\ldots, x_{n,2})\), where observations in the \(i\)th row of each dataset represent information about the same individual. We would like to cluster using information common to both datasets. One could concatenate the datasets, adding additional covariates for each individual. However, if the two datasets have different clustering structures this would reduce the signal of both clusterings and probably have one dominate.</description>
+      <description>
+
+
+&lt;div id=&#34;multiple-dataset-integration&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Multiple Dataset Integration&lt;/h1&gt;
+&lt;p&gt;If we have observed paired datasets &lt;span class=&#34;math inline&#34;&gt;\(X_1=(x_{1,1},\ldots, x_{n,1})\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(X_2=(x_{1,2},\ldots, x_{n,2})\)&lt;/span&gt;, where observations in the &lt;span class=&#34;math inline&#34;&gt;\(i\)&lt;/span&gt;th row of each dataset represent information about the same individual. We would like to cluster using information common to both datasets. One could concatenate the datasets, adding additional covariates for each individual. However, if the two datasets have different clustering structures this would reduce the signal of both clusterings and probably have one dominate. If the two datasets have the same structure but different signal-to-noise ratios this would reduce the signal in the final clustering. In both these cases independent models on each dataset would be preferable. &lt;span class=&#34;citation&#34;&gt;Kirk et al. (2012)&lt;/span&gt; suggest a method to carry out clustering on both datasets where common information is used but two individual clusterings are outputted. This method is driven by the allocation prior:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[p(c_{i,1}, c_{i,2} | \phi ) \propto \pi_{i,1} \pi_{i,2} ( 1 + \phi \mathbb{I} ( c_{i,1} = c_{i,2}))\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Here &lt;span class=&#34;math inline&#34;&gt;\(\phi \in \mathbb{R}_{+}\)&lt;/span&gt; controls the strength of association between datasets. The above equation states that the probability of allocating individual &lt;span class=&#34;math inline&#34;&gt;\(i\)&lt;/span&gt; to component &lt;span class=&#34;math inline&#34;&gt;\(c_{i,1}\)&lt;/span&gt; in dataset 1 and to component &lt;span class=&#34;math inline&#34;&gt;\(c_{i,2}\)&lt;/span&gt; in dataset 2 is proportional to the proportion of these components within each dataset and up-weighted by &lt;span class=&#34;math inline&#34;&gt;\(\phi\)&lt;/span&gt; if the individual has the same labelling in each dataset. Thus as &lt;span class=&#34;math inline&#34;&gt;\(\phi\)&lt;/span&gt; grows the correlation between the clusterings grow and we are more likely to see the same clustering emerge from each dataset. Conversely if &lt;span class=&#34;math inline&#34;&gt;\(\phi = 0\)&lt;/span&gt; we have independent mixture models. Note that &lt;span class=&#34;citation&#34;&gt;Kirk et al. (2012)&lt;/span&gt; include the generalised case for &lt;span class=&#34;math inline&#34;&gt;\(L\)&lt;/span&gt; datasets for any &lt;span class=&#34;math inline&#34;&gt;\(L \in \mathbb{N}\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;MDI has been applied to precision medicine, specifically glioblastoma sub-typing &lt;span class=&#34;citation&#34;&gt;(Savage et al. 2013)&lt;/span&gt;, in the past showing its potential as a tool.&lt;/p&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level2 unnumbered&#34;&gt;
+&lt;h2&gt;References&lt;/h2&gt;
+&lt;div id=&#34;refs&#34; class=&#34;references&#34;&gt;
+&lt;div id=&#34;ref-kirk2012bayesian&#34;&gt;
+&lt;p&gt;Kirk, Paul, Jim E Griffin, Richard S Savage, Zoubin Ghahramani, and David L Wild. 2012. “Bayesian Correlated Clustering to Integrate Multiple Datasets.” &lt;em&gt;Bioinformatics&lt;/em&gt; 28 (24). Oxford University Press: 3290–7.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;ref-savage2013identifying&#34;&gt;
+&lt;p&gt;Savage, Richard S, Zoubin Ghahramani, Jim E Griffin, Paul Kirk, and David L Wild. 2013. “Identifying Cancer Subtypes in Glioblastoma by Combining Genomic, Transcriptomic and Epigenomic Data.” &lt;em&gt;arXiv Preprint arXiv:1304.3577&lt;/em&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>An introduction to MDI</title>
+      <link>/tutorial/an-introduction-to-mdi/</link>
+      <pubDate>Tue, 19 Feb 2019 00:00:00 +0000</pubDate>
+      <guid>/tutorial/an-introduction-to-mdi/</guid>
+      <description>
+
+
+&lt;div id=&#34;multiple-dataset-integration&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Multiple Dataset Integration&lt;/h1&gt;
+&lt;p&gt;If we have observed paired datasets &lt;span class=&#34;math inline&#34;&gt;\(X_1=(x_{1,1},\ldots, x_{n,1})\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(X_2=(x_{1,2},\ldots, x_{n,2})\)&lt;/span&gt;, where observations in the &lt;span class=&#34;math inline&#34;&gt;\(i\)&lt;/span&gt;th row of each dataset represent information about the same individual. We would like to cluster using information common to both datasets. One could concatenate the datasets, adding additional covariates for each individual. However, if the two datasets have different clustering structures this would reduce the signal of both clusterings and probably have one dominate. If the two datasets have the same structure but different signal-to-noise ratios this would reduce the signal in the final clustering. In both these cases independent models on each dataset would be preferable. &lt;span class=&#34;citation&#34;&gt;Kirk et al. (2012)&lt;/span&gt; suggest a method to carry out clustering on both datasets where common information is used but two individual clusterings are outputted. This method is driven by the allocation prior:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[p(c_{i,1}, c_{i,2} | \phi ) \propto \pi_{i,1} \pi_{i,2} ( 1 + \phi \mathbb{I} ( c_{i,1} = c_{i,2}))\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Here &lt;span class=&#34;math inline&#34;&gt;\(\phi \in \mathbb{R}_{+}\)&lt;/span&gt; controls the strength of association between datasets. The above equation states that the probability of allocating individual &lt;span class=&#34;math inline&#34;&gt;\(i\)&lt;/span&gt; to component &lt;span class=&#34;math inline&#34;&gt;\(c_{i,1}\)&lt;/span&gt; in dataset 1 and to component &lt;span class=&#34;math inline&#34;&gt;\(c_{i,2}\)&lt;/span&gt; in dataset 2 is proportional to the proportion of these components within each dataset and up-weighted by &lt;span class=&#34;math inline&#34;&gt;\(\phi\)&lt;/span&gt; if the individual has the same labelling in each dataset. Thus as &lt;span class=&#34;math inline&#34;&gt;\(\phi\)&lt;/span&gt; grows the correlation between the clusterings grow and we are more likely to see the same clustering emerge from each dataset. Conversely if &lt;span class=&#34;math inline&#34;&gt;\(\phi = 0\)&lt;/span&gt; we have independent mixture models. Note that &lt;span class=&#34;citation&#34;&gt;Kirk et al. (2012)&lt;/span&gt; include the generalised case for &lt;span class=&#34;math inline&#34;&gt;\(L\)&lt;/span&gt; datasets for any &lt;span class=&#34;math inline&#34;&gt;\(L \in \mathbb{N}\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;MDI has been applied to precision medicine, specifically glioblastoma sub-typing &lt;span class=&#34;citation&#34;&gt;(Savage et al. 2013)&lt;/span&gt;, in the past showing its potential as a tool.&lt;/p&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level2 unnumbered&#34;&gt;
+&lt;h2&gt;References&lt;/h2&gt;
+&lt;div id=&#34;refs&#34; class=&#34;references&#34;&gt;
+&lt;div id=&#34;ref-kirk2012bayesian&#34;&gt;
+&lt;p&gt;Kirk, Paul, Jim E Griffin, Richard S Savage, Zoubin Ghahramani, and David L Wild. 2012. “Bayesian Correlated Clustering to Integrate Multiple Datasets.” &lt;em&gt;Bioinformatics&lt;/em&gt; 28 (24). Oxford University Press: 3290–7.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;ref-savage2013identifying&#34;&gt;
+&lt;p&gt;Savage, Richard S, Zoubin Ghahramani, Jim E Griffin, Paul Kirk, and David L Wild. 2013. “Identifying Cancer Subtypes in Glioblastoma by Combining Genomic, Transcriptomic and Epigenomic Data.” &lt;em&gt;arXiv Preprint arXiv:1304.3577&lt;/em&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</description>
     </item>
     
   </channel>

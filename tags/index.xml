@@ -1,31 +1,21 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Tags on An Rí Rua</title>
+    <title>Tags | An Rí Rua</title>
     <link>/tags/</link>
-    <description>Recent content in Tags on An Rí Rua</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <language>en-uk</language>
-    <copyright>UA-135362222-1</copyright>
-    <lastBuildDate>Wed, 15 May 2019 00:00:00 +0000</lastBuildDate>
-    
-	<atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
-    
-    
-    <item>
-      <title>Chris Wallace</title>
-      <link>/tags/chris-wallace/</link>
-      <pubDate>Wed, 15 May 2019 00:00:00 +0000</pubDate>
-      
-      <guid>/tags/chris-wallace/</guid>
-      <description></description>
-    </item>
+      <atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
+    <description>Tags</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>UA-135362222-1</copyright><lastBuildDate>Tue, 19 Feb 2019 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>/img/icon-192.png</url>
+      <title>Tags</title>
+      <link>/tags/</link>
+    </image>
     
     <item>
       <title>MDI</title>
       <link>/tags/mdi/</link>
-      <pubDate>Wed, 15 May 2019 00:00:00 +0000</pubDate>
-      
+      <pubDate>Tue, 19 Feb 2019 00:00:00 +0000</pubDate>
       <guid>/tags/mdi/</guid>
       <description></description>
     </item>
@@ -33,8 +23,7 @@
     <item>
       <title>Paul Kirk</title>
       <link>/tags/paul-kirk/</link>
-      <pubDate>Wed, 15 May 2019 00:00:00 +0000</pubDate>
-      
+      <pubDate>Tue, 19 Feb 2019 00:00:00 +0000</pubDate>
       <guid>/tags/paul-kirk/</guid>
       <description></description>
     </item>

@@ -1,23 +1,40 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Authors on An Rí Rua</title>
+    <title>Authors | An Rí Rua</title>
     <link>/authors/</link>
-    <description>Recent content in Authors on An Rí Rua</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <language>en-uk</language>
-    <copyright>UA-135362222-1</copyright>
-    
-	<atom:link href="/authors/index.xml" rel="self" type="application/rss+xml" />
-    
+      <atom:link href="/authors/index.xml" rel="self" type="application/rss+xml" />
+    <description>Authors</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>UA-135362222-1</copyright>
+    <image>
+      <url>/img/icon-192.png</url>
+      <title>Authors</title>
+      <link>/authors/</link>
+    </image>
     
     <item>
-      <title>admin</title>
+      <title></title>
       <link>/authors/admin/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
       <guid>/authors/admin/</guid>
-      <description></description>
+      <description>&lt;p&gt;I am a PhD student in the &lt;a href=&#34;http://chr1swallace.github.io&#34; target=&#34;_blank&#34;&gt;&lt;strong&gt;Wallace Group&lt;/strong&gt;&lt;/a&gt; based at the MRC Biostatistics Unit of the University of Cambridge. I am working on integrative clustering methods applied to &amp;lsquo;omics data. Clustering methods aim to improve our ability to interpret this high dimensional data and improve our understanding of human health and disease.&lt;/p&gt;
+
+&lt;p&gt;Previosuly I completed a MSc in Bioinformatics at Wageningen University. My dissertation subject was an approximate Bayesian inference suitable for high dimensional, multi-modal datasets.&lt;/p&gt;
+
+&lt;p&gt;Previously I have worked with &lt;a href=&#34;http://www.mrc-bsu.cam.ac.uk/people/in-alphabetical-order/h-to-m/paul-kirk/&#34; target=&#34;_blank&#34;&gt;&lt;strong&gt;Paul Kirk&lt;/strong&gt;&lt;/a&gt;,
+&lt;a href=&#34;https://lgatto.github.io/&#34; target=&#34;_blank&#34;&gt;&lt;strong&gt;Laurent Gatto&lt;/strong&gt;&lt;/a&gt; and &lt;a href=&#34;https://www.mrc-bsu.cam.ac.uk/people/in-alphabetical-order/a-to-g/oliver-crook/&#34; target=&#34;_blank&#34;&gt;&lt;strong&gt;Olly Crook&lt;/strong&gt;&lt;/a&gt;
+to extend MDI, a Bayesian integrative clustering method, to a semi-supervised predictive tool in spatial proetomics. This is available online in &lt;a href=&#34;https://github.com/stcolema/tagmmdi&#34; target=&#34;_blank&#34;&gt;&lt;code&gt;tagm-mdi&lt;/code&gt;&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;I also worked with Gerrit Gort, Elias Kaiser and Rachel Schipper to model the Farquhar-van Cammerer-Berry model of photosynthesis using mixed-effect models.&lt;/p&gt;
+
+&lt;p&gt;My research interests include Bayesian clustering applied to &amp;lsquo;omics data to
+extract biological information. Within &amp;lsquo;omics we have huge quantities of data,
+often with several datasets pertaining to the same objects of interest across
+several views  (e.g. genomic, proteomic, methylation, metabolomic, etc.);
+interpreting this and creating a coherent story of disease is a non-trivial
+problem. In the course of my PhD I hope to use clustering methods applied to
+immune mediated disease data to improve our understanding of disease.&lt;/p&gt;
+</description>
     </item>
     
   </channel>
