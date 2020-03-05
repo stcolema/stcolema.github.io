@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Overview | An Rí Rua</title>
+    <link>/tutorial/</link>
+      <atom:link href="/tutorial/index.xml" rel="self" type="application/rss+xml" />
+    <description>Overview</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>UA-135362222-1</copyright><lastBuildDate>Sun, 09 Sep 2018 00:00:00 +0100</lastBuildDate>
+    <image>
+      <url>/img/icon-192.png</url>
+      <title>Overview</title>
+      <link>/tutorial/</link>
+    </image>
+    
+    <item>
+      <title>An introduction to MDI</title>
+      <link>/tutorial/an-introduction-to-mdi/</link>
+      <pubDate>Tue, 19 Feb 2019 00:00:00 +0000</pubDate>
+      <guid>/tutorial/an-introduction-to-mdi/</guid>
+      <description>
+
+
+&lt;div id=&#34;multiple-dataset-integration&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Multiple Dataset Integration&lt;/h1&gt;
+&lt;p&gt;If we have observed paired datasets &lt;span class=&#34;math inline&#34;&gt;\(X_1=(x_{1,1},\ldots, x_{n,1})\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(X_2=(x_{1,2},\ldots, x_{n,2})\)&lt;/span&gt;, where observations in the &lt;span class=&#34;math inline&#34;&gt;\(i\)&lt;/span&gt;th row of each dataset represent information about the same individual. We would like to cluster using information common to both datasets. One could concatenate the datasets, adding additional covariates for each individual. However, if the two datasets have different clustering structures this would reduce the signal of both clusterings and probably have one dominate. If the two datasets have the same structure but different signal-to-noise ratios this would reduce the signal in the final clustering. In both these cases independent models on each dataset would be preferable. &lt;span class=&#34;citation&#34;&gt;Kirk et al. (2012)&lt;/span&gt; suggest a method to carry out clustering on both datasets where common information is used but two individual clusterings are outputted. This method is driven by the allocation prior:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[p(c_{i,1}, c_{i,2} | \phi ) \propto \pi_{i,1} \pi_{i,2} ( 1 + \phi \mathbb{I} ( c_{i,1} = c_{i,2}))\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Here &lt;span class=&#34;math inline&#34;&gt;\(\phi \in \mathbb{R}_{+}\)&lt;/span&gt; controls the strength of association between datasets. The above equation states that the probability of allocating individual &lt;span class=&#34;math inline&#34;&gt;\(i\)&lt;/span&gt; to component &lt;span class=&#34;math inline&#34;&gt;\(c_{i,1}\)&lt;/span&gt; in dataset 1 and to component &lt;span class=&#34;math inline&#34;&gt;\(c_{i,2}\)&lt;/span&gt; in dataset 2 is proportional to the proportion of these components within each dataset and up-weighted by &lt;span class=&#34;math inline&#34;&gt;\(\phi\)&lt;/span&gt; if the individual has the same labelling in each dataset. Thus as &lt;span class=&#34;math inline&#34;&gt;\(\phi\)&lt;/span&gt; grows the correlation between the clusterings grow and we are more likely to see the same clustering emerge from each dataset. Conversely if &lt;span class=&#34;math inline&#34;&gt;\(\phi = 0\)&lt;/span&gt; we have independent mixture models. Note that &lt;span class=&#34;citation&#34;&gt;Kirk et al. (2012)&lt;/span&gt; include the generalised case for &lt;span class=&#34;math inline&#34;&gt;\(L\)&lt;/span&gt; datasets for any &lt;span class=&#34;math inline&#34;&gt;\(L \in \mathbb{N}\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;MDI has been applied to precision medicine, specifically glioblastoma sub-typing &lt;span class=&#34;citation&#34;&gt;(Savage et al. 2013)&lt;/span&gt;, in the past showing its potential as a tool.&lt;/p&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level2 unnumbered&#34;&gt;
+&lt;h2&gt;References&lt;/h2&gt;
+&lt;div id=&#34;refs&#34; class=&#34;references&#34;&gt;
+&lt;div id=&#34;ref-kirk2012bayesian&#34;&gt;
+&lt;p&gt;Kirk, Paul, Jim E Griffin, Richard S Savage, Zoubin Ghahramani, and David L Wild. 2012. “Bayesian Correlated Clustering to Integrate Multiple Datasets.” &lt;em&gt;Bioinformatics&lt;/em&gt; 28 (24). Oxford University Press: 3290–7.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;ref-savage2013identifying&#34;&gt;
+&lt;p&gt;Savage, Richard S, Zoubin Ghahramani, Jim E Griffin, Paul Kirk, and David L Wild. 2013. “Identifying Cancer Subtypes in Glioblastoma by Combining Genomic, Transcriptomic and Epigenomic Data.” &lt;em&gt;arXiv Preprint arXiv:1304.3577&lt;/em&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
