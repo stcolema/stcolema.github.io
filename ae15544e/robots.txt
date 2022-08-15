@@ -1,1 +1,0 @@
-Sitemap: https://github.com/stcolema/stcolema.github.io/sitemap.xml
