@@ -1,0 +1,19 @@
+---
+title: "Me"
+image: profile.jpg
+about:
+  template: jolla
+  links:
+    - icon: twitter
+      text: Twitter
+      href: https://twitter.com/stcolema1
+    - icon: linkedin
+      text: LinkedIn
+      href: https://www.linkedin.com/in/stephen-coleman-03432184/
+    - icon: github
+      text: Github
+      href: https://github.com/stcolema
+
+---
+
+I am a PhD student in Cambridge working with Bayesian model-based clustering methods.

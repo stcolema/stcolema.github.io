@@ -1,0 +1,41 @@
+# options specified here will apply to all posts in this folder
+
+# freeze computational output
+# (see https://quarto.org/docs/projects/code-execution.html#freeze)
+freeze: true
+
+# Enable banner style title blocks
+title-block-banner: true
+
+# Enable CC licence appendix
+license: "CC BY"
+
+# Default for table of contents
+toc: true
+toc-title: Table of contents
+toc-location: left
+
+# Default knitr options
+execute:
+  echo: true
+  message: true
+  warning: true
+
+# Default author
+author:
+  - name: Stephen Coleman
+    url: https://stcolema.github.io
+    affiliation: MRC Biostatistics Unit, University of Cambridge
+    affiliation-url: https://www.mrc-bsu.cam.ac.uk
+    orcid: 0000-0002-2294-8869
+
+# Default fields for citation
+citation: true
+
+# Customised formatting (UNUSED)
+# format:
+#   html:
+#     theme: ember.scss
+#     css: styles.css
+
+

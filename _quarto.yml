@@ -1,0 +1,23 @@
+project:
+  type: website
+  output-dir: _site
+execute:
+  freeze: auto
+website:
+  title: "Barefoot Bayes"
+  site-url: https://stcolema.github.io/
+  description: "Adventures in barefoot running, Bayesian stats and coffee"
+  image: onyx_ball.jpg
+  navbar:
+    right:
+      - about.qmd
+      - icon: github
+        href: https://github.com/stcolema
+      - icon: twitter
+        href: https://twitter.com/stcolema1
+format:
+  html:
+    theme:
+      light: lumen
+      dark: darkly
+    css: styles.css

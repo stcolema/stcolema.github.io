@@ -1,0 +1,324 @@
+
+% === MCMC =====================================================================
+
+@article{Hastings1970MonteCarloSampling,
+  title = {Monte {{Carlo Sampling Methods Using Markov Chains}} and {{Their Applications}}},
+  abstract = {A generalization of the sampling method introduced by Metropolis et al. (1953) is presented along with an exposition of the relevant theory, techniques of application and methods and difficulties of assessing the error in Monte Carlo estimates. Examples of the methods, including the generation of random orthogonal matrices and potential applications of the methods to numerical problems arising in statistics, are discussed.},
+  language = {en},
+  journal= {Biometrika},
+  author = {Hastings, W Keith},
+  pages = {14},
+  year={1970},
+  publisher={Oxford University Press}
+}
+
+@article{Metropolis1953EquationStateCalculations,
+  title = {Equation of {{State Calculations}} by {{Fast Computing Machines}}},
+  volume = {21},
+  issn = {0021-9606, 1089-7690},
+  doi = {10.1063/1.1699114},
+  language = {en},
+  number = {6},
+  journal = {The Journal of Chemical Physics},
+  author = {Metropolis, Nicholas and Rosenbluth, Arianna W. and Rosenbluth, Marshall N. and Teller, Augusta H. and Teller, Edward},
+  month = jun,
+  year = {1953},
+  pages = {1087-1092},
+}
+
+@article{Metropolis1949MonteCarloMethod,
+  title = {The {{Monte Carlo Method}}},
+  volume = {44},
+  issn = {01621459},
+  doi = {10.2307/2280232},
+  number = {247},
+  journal = {Journal of the American Statistical Association},
+  author = {Metropolis, Nicholas and Ulam, S.},
+  month = sep,
+  year = {1949},
+  pages = {335}
+}
+
+@article{Geman1984GibbsSampling,
+  author={Geman, Stuart and Geman, Donald},
+  journal={{IEEE Transactions on Pattern Analysis and Machine Intelligence}}, 
+  title={{Stochastic Relaxation, Gibbs Distributions, and the Bayesian Restoration of Images}}, 
+  year={1984},
+  volume={PAMI-6},
+  number={6},
+  pages={721-741},
+  doi={10.1109/TPAMI.1984.4767596}
+}
+
+@article{Tanner1987CalculationOfPosteriorDistributions,
+  author = {Martin A. Tanner and Wing Hung Wong},
+  title = {{The Calculation of Posterior Distributions by Data Augmentation}},
+  journal = {{Journal of the American Statistical Association}},
+  volume = {82},
+  number = {398},
+  pages = {528-540},
+  year  = {1987},
+  publisher = {Taylor & Francis},
+  doi = {10.1080/01621459.1987.10478458},
+  URL = {https://www.tandfonline.com/doi/abs/10.1080/01621459.1987.10478458},
+  eprint = {https://www.tandfonline.com/doi/pdf/10.1080/01621459.1987.10478458}
+}
+
+@article{Gelfand1990SamplingMarginalDensities,
+  author = {Alan E. Gelfand and Adrian F. M. Smith },
+  title = {{Sampling-Based Approaches to Calculating Marginal Densities}},
+  journal = {Journal of the American Statistical Association},
+  volume = {85},
+  number = {410},
+  pages = {398-409},
+  year  = {1990},
+  publisher = {Taylor & Francis},
+  doi = {10.1080/01621459.1990.10476213},
+  URL = {https://www.tandfonline.com/doi/abs/10.1080/01621459.1990.10476213},
+  eprint = {https://www.tandfonline.com/doi/pdf/10.1080/01621459.1990.10476213}
+}
+
+@book{mcgrayne2011theory,
+  title={The Theory That Would Not Die: How Bayes' Rule Cracked the Enigma Code, Hunted Down Russian Submarines, \& Emerged Triumphant from Two Centuries of C},
+  author={McGrayne, Sharon Bertsch},
+  year={2011},
+  publisher={Yale University Press}
+}
+
+@article{Berger2000BaysianAnalysis,
+  author = {James O. Berger },
+  title = {Bayesian Analysis: A Look at Today and Thoughts of Tomorrow},
+  journal = {Journal of the American Statistical Association},
+  volume = {95},
+  number = {452},
+  pages = {1269-1276},
+  year  = {2000},
+  publisher = {Taylor & Francis},
+  doi = {10.1080/01621459.2000.10474328},
+  URL = {https://www.tandfonline.com/doi/abs/10.1080/01621459.2000.10474328},
+  eprint = {https://www.tandfonline.com/doi/pdf/10.1080/01621459.2000.10474328}
+}
+
+@InProceedings{syed2021pt,
+  title = 	 {Parallel tempering on optimized paths},
+  author =       {Syed, Saifuddin and Romaniello, Vittorio and Campbell, Trevor and Bouchard-Cote, Alexandre},
+  booktitle = 	 {Proceedings of the 38th International Conference on Machine Learning},
+  pages = 	 {10033--10042},
+  year = 	 {2021},
+  editor = 	 {Meila, Marina and Zhang, Tong},
+  volume = 	 {139},
+  series = 	 {Proceedings of Machine Learning Research},
+  month = 	 {18--24 Jul},
+  publisher =    {PMLR},
+  pdf = 	 {http://proceedings.mlr.press/v139/syed21a/syed21a.pdf},
+  url = 	 {https://proceedings.mlr.press/v139/syed21a.html},
+  abstract = 	 {Parallel tempering (PT) is a class of Markov chain Monte Carlo algorithms that constructs a path of distributions annealing between a tractable reference and an intractable target, and then interchanges states along the path to improve mixing in the target. The performance of PT depends on how quickly a sample from the reference distribution makes its way to the target, which in turn depends on the particular path of annealing distributions. However, past work on PT has used only simple paths constructed from convex combinations of the reference and target log-densities. This paper begins by demonstrating that this path performs poorly in the setting where the reference and target are nearly mutually singular. To address this issue, we expand the framework of PT to general families of paths, formulate the choice of path as an optimization problem that admits tractable gradient estimates, and propose a flexible new family of spline interpolation paths for use in practice. Theoretical and empirical results both demonstrate that our proposed methodology breaks previously-established upper performance limits for traditional paths.}
+}
+
+@article{syed2021ScalablePT,
+  author = {Syed, Saifuddin and Bouchard-Côté, Alexandre and Deligiannidis, George and Doucet, Arnaud},
+  title = {Non-reversible parallel tempering: A scalable highly parallel MCMC scheme},
+  journal = {Journal of the Royal Statistical Society: Series B (Statistical Methodology)},
+  volume = {84},
+  number = {2},
+  pages = {321-350},
+  keywords = {annealing schedule optimization, Markov Chain Monte Carlo, parallel computing, parallel tempering, weak convergence},
+  doi = {https://doi.org/10.1111/rssb.12464},
+  url = {https://rss.onlinelibrary.wiley.com/doi/abs/10.1111/rssb.12464},
+  eprint = {https://rss.onlinelibrary.wiley.com/doi/pdf/10.1111/rssb.12464},
+  abstract = {Abstract Parallel tempering (PT) methods are a popular class of Markov chain Monte Carlo schemes used to sample complex high-dimensional probability distributions. They rely on a collection of N interacting auxiliary chains targeting tempered versions of the target distribution to improve the exploration of the state space. We provide here a new perspective on these highly parallel algorithms and their tuning by identifying and formalizing a sharp divide in the behaviour and performance of reversible versus non-reversible PT schemes. We show theoretically and empirically that a class of non-reversible PT methods dominates its reversible counterparts and identify distinct scaling limits for the non-reversible and reversible schemes, the former being a piecewise-deterministic Markov process and the latter a diffusion. These results are exploited to identify the optimal annealing schedule for non-reversible PT and to develop an iterative scheme approximating this schedule. We provide a wide range of numerical examples supporting our theoretical and methodological contributions. The proposed methodology is applicable to sample from a distribution π with a density L with respect to a reference distribution π0 and compute the normalizing constant ∫Ldπ0. A typical use case is when π0 is a prior distribution, L a likelihood function and π the corresponding posterior distribution.},
+  year = {2022}
+}
+
+
+@article{geyer1991markov,
+  title={Markov chain Monte Carlo maximum likelihood},
+  author={Geyer, Charles J},
+  year={1991},
+  publisher={Interface Foundation of North America}
+}
+
+@article{OKABE2001435,
+  title = {Replica-exchange Monte Carlo method for the isobaric–isothermal ensemble},
+  journal = {Chemical Physics Letters},
+  volume = {335},
+  number = {5},
+  pages = {435-439},
+  year = {2001},
+  issn = {0009-2614},
+  doi = {https://doi.org/10.1016/S0009-2614(01)00055-0},
+  url = {https://www.sciencedirect.com/science/article/pii/S0009261401000550},
+  author = {Tsuneyasu Okabe and Masaaki Kawata and Yuko Okamoto and Masuhiro Mikami},
+  abstract = {We propose an extension of replica-exchange Monte Carlo method for canonical ensemble to isothermal–isobaric ensemble as an effective method to search for stable states quickly and widely in complex configuration space. We investigated the efficiency of the new method on a benchmark testing system which consists of 256 Lennard-Jones particles. The new method enables us to shorten dramatically the relaxation time of phase change from liquid structure to crystal structure in comparison with the conventional Monte Carlo method.}
+}
+
+@InProceedings{trippe2022ParitionCoupling,
+  title = 	 { Many processors, little time: MCMC for partitions via optimal transport couplings },
+  author =       {Nguyen, Tin D. and Trippe, Brian L. and Broderick, Tamara},
+  booktitle = 	 {Proceedings of The 25th International Conference on Artificial Intelligence and Statistics},
+  pages = 	 {3483--3514},
+  year = 	 {2022},
+  editor = 	 {Camps-Valls, Gustau and Ruiz, Francisco J. R. and Valera, Isabel},
+  volume = 	 {151},
+  series = 	 {Proceedings of Machine Learning Research},
+  month = 	 {28--30 Mar},
+  publisher =    {PMLR},
+  pdf = 	 {https://proceedings.mlr.press/v151/nguyen22a/nguyen22a.pdf},
+  url = 	 {https://proceedings.mlr.press/v151/nguyen22a.html},
+  abstract = 	 { Markov chain Monte Carlo (MCMC) methods are often used in clustering since they guarantee asymptotically exact expectations in the infinite-time limit. In finite time, though, slow mixing often leads to poor performance. Modern computing environments offer massive parallelism, but naive implementations of parallel MCMC can exhibit substantial bias. In MCMC samplers of continuous random variables, Markov chain couplings can overcome bias. But these approaches depend crucially on paired chains meetings after a small number of transitions. We show that straightforward applications of existing coupling ideas to discrete clustering variables fail to meet quickly. This failure arises from the "label-switching problem": semantically equivalent cluster relabelings impede fast meeting of coupled chains. We instead consider chains as exploring the space of partitions rather than partitions’ (arbitrary) labelings. Using a metric on the partition space, we formulate a practical algorithm using optimal transport couplings. Our theory confirms our method is accurate and efficient. In experiments ranging from clustering of genes or seeds to graph colorings, we show the benefits of our coupling in the highly parallel, time-limited regime. }
+}
+
+@article{Jacob2011ParallelMCMCIdea,
+  author = {P. Jacob and C. P. Robert and M. H. Smith},
+  title = {Using Parallel Computation to Improve Independent Metropolis–Hastings Based Estimation},
+  journal = {Journal of Computational and Graphical Statistics},
+  volume = {20},
+  number = {3},
+  pages = {616-635},
+  year  = {2011},
+  publisher = {Taylor & Francis},
+  doi = {10.1198/jcgs.2011.10167},
+  URL = {https://doi.org/10.1198/jcgs.2011.10167},
+  eprint = {https://doi.org/10.1198/jcgs.2011.10167}
+}
+
+
+@inproceedings{wang2015ParallelMCMCIdea,
+  author = {Wang, Xiangyu and Guo, Fangjian and Heller, Katherine A and Dunson, David B},
+  booktitle = {Advances in Neural Information Processing Systems},
+  editor = {C. Cortes and N. Lawrence and D. Lee and M. Sugiyama and R. Garnett},
+  pages = {},
+  publisher = {Curran Associates, Inc.},
+  title = {Parallelizing MCMC with Random Partition Trees},
+  url = {https://proceedings.neurips.cc/paper/2015/file/40008b9a5380fcacce3976bf7c08af5b-Paper.pdf},
+  volume = {28},
+  year = {2015}
+}
+
+@article{Scott2016ConsensusMonteCarlo,
+  author = {Steven L. Scott and Alexander W. Blocker and Fernando V. Bonassi and Hugh A. Chipman and Edward I. George and Robert E. McCulloch},
+  title = {Bayes and big data: the consensus Monte Carlo algorithm},
+  journal = {International Journal of Management Science and Engineering Management},
+  volume = {11},
+  number = {2},
+  pages = {78-88},
+  year  = {2016},
+  publisher = {Taylor & Francis},
+  doi = {10.1080/17509653.2016.1142191},
+  URL = {https://doi.org/10.1080/17509653.2016.1142191},
+  eprint = {https://doi.org/10.1080/17509653.2016.1142191}
+}
+
+
+@article{Dahl2003SplitMerge,
+  title={An improved merge-split sampler for conjugate {D}irichlet process mixture models},
+  author={Dahl, David B},
+  journal={Technical R eport},
+  volume={1},
+  pages={086},
+  year={2003},
+  publisher={Citeseer}
+}
+
+@article{Bouchard2017PGSM,
+  title={Particle {G}ibbs split-merge sampling for {B}ayesian inference in mixture models},
+  author={Bouchard-C{\^o}t{\'e}, Alexandre and Doucet, Arnaud and Roth, Andrew},
+  journal={Journal of Machine Learning Research},
+  volume={18},
+  number={28},
+  year={2017},
+  publisher={Journal of Machine Learning Research}
+}
+
+
+@article{Jain2004SplitMerge,
+    author = {Sonia Jain and Radford M Neal},
+    title = {A Split-Merge Markov chain Monte Carlo Procedure for the Dirichlet Process Mixture Model},
+    journal = {Journal of Computational and Graphical Statistics},
+    volume = {13},
+    number = {1},
+    pages = {158-182},
+    year  = {2004},
+    publisher = {Taylor & Francis},
+    doi = {10.1198/1061860043001},
+    URL = {https://doi.org/10.1198/1061860043001},
+    eprint = {https://doi.org/10.1198/1061860043001}
+}
+
+
+% === R hat ====================================================================
+
+
+@article{gelman1992inference,
+	author={Gelman, Andrew and Rubin, Donald B and others},
+  title={Inference from iterative simulation using multiple sequences},
+  journal={Statistical science},
+  year={1992},
+	volume={7},
+  number={4},
+  pages={457--472},
+  publisher={Institute of Mathematical Statistics}
+}
+
+@misc{Moins2022LocalRhat,
+  doi = {10.48550/ARXIV.2205.06694},
+  url = {https://arxiv.org/abs/2205.06694},
+  author = {Moins, Théo and Arbel, Julyan and Dutfoy, Anne and Girard, Stéphane},
+  keywords = {Statistics Theory (math.ST), Computation (stat.CO), Methodology (stat.ME), Other Statistics (stat.OT), FOS: Mathematics, FOS: Mathematics, FOS: Computer and information sciences, FOS: Computer and information sciences},
+  title = {On the use of a local $\hat{R}$ to improve MCMC convergence diagnostic},
+  publisher = {arXiv},
+  year = {2022},
+  copyright = {Creative Commons Attribution 4.0 International}
+}
+
+@article{Vehtari2021RankNormalisation,
+author = {Aki Vehtari and Andrew Gelman and Daniel Simpson and Bob Carpenter and Paul-Christian B{\"u}rkner},
+title = {{Rank-Normalization, Folding, and Localization: An Improved $\widehat{R}$ for Assessing Convergence of MCMC (with Discussion)}},
+volume = {16},
+journal = {Bayesian Analysis},
+number = {2},
+publisher = {International Society for Bayesian Analysis},
+pages = {667 -- 718},
+year = {2021},
+doi = {10.1214/20-BA1221},
+URL = {https://doi.org/10.1214/20-BA1221}
+}
+
+@article{Vats2021Revisiting,
+author = {Dootika Vats and Christina Knudson},
+title = {{Revisiting the Gelman–Rubin Diagnostic}},
+volume = {36},
+journal = {Statistical Science},
+number = {4},
+publisher = {Institute of Mathematical Statistics},
+pages = {518 -- 529},
+keywords = {batch means, Convergence diagnostic, effective sample size, Gelman–Rubin, Markov chain Monte Carlo},
+year = {2021},
+doi = {10.1214/20-STS812},
+URL = {https://doi.org/10.1214/20-STS812}
+}
+
+
+
+# === Consensus clustering ===============================================
+
+﻿@Article{Monti2003CC,
+author={Monti, Stefano
+and Tamayo, Pablo
+and Mesirov, Jill
+and Golub, Todd},
+title={Consensus Clustering: A Resampling-Based Method for Class Discovery and Visualization of Gene Expression Microarray Data},
+journal={Machine Learning},
+year={2003},
+month={Jul},
+day={01},
+volume={52},
+number={1},
+pages={91-118},
+abstract={In this paper we present a new methodology of class discovery and clustering validation tailored to the task of analyzing gene expression data. The method can best be thought of as an analysis approach, to guide and assist in the use of any of a wide range of available clustering algorithms. We call the new methodology consensus clustering, and in conjunction with resampling techniques, it provides for a method to represent the consensus across multiple runs of a clustering algorithm and to assess the stability of the discovered clusters. The method can also be used to represent the consensus over multiple runs of a clustering algorithm with random restart (such as K-means, model-based Bayesian clustering, SOM, etc.), so as to account for its sensitivity to the initial conditions. Finally, it provides for a visualization tool to inspect cluster number, membership, and boundaries. We present the results of our experiments on both simulated data and real gene expression data aimed at evaluating the effectiveness of the methodology in discovering biologically meaningful clusters.},
+issn={1573-0565},
+doi={10.1023/A:1023949509487},
+url={https://doi.org/10.1023/A:1023949509487}
+}
+
+

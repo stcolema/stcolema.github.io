@@ -1,0 +1,15 @@
+---
+title: "Barefoot Bayes"
+subtitle: Ramblings from Stephen Coleman
+listing:
+  contents: posts
+  sort: "date desc"
+  type: default
+  categories: true
+  sort-ui: false
+  filter-ui: false
+page-layout: full
+title-block-banner: true
+---
+
+A blog of Bayesian statistics and barefoot running along with some coffee. Any similarity to actual persons, living or dead, actual events, or any relevance to anything useful or interesting is purely coincidental.
