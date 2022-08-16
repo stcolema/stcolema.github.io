@@ -48,3 +48,85 @@ Most of the talks were over my head throughout the conference, so I'm not going 
 I unfortunately had to miss a set of talks to host an [online talk](https://www.youtube.com/watch?v=rUKuzhrHJE8) from [Trevor Campbell](https://trevorcampbell.me/) about his and his group's work on Bayesian coresets. This loss was mitigated by how great a talk Trevor gave. The work itself is very interesting (hence why I had been attempting to wrangle an invite to Trevor to speak for awhile), but Trevor has also clearly thought a lot about how to convey information and how to present his work, so I really enjoyed it.
 
 My own talk went down well, with both David and Sara Wade being particularly positive. It was really nice to have the opportunity to discuss the work a little with them both.
+
+I found the conference very wearing though; I'm not fluent in BNP, the travel to be there and as an autistic person that level of exposure to people was just a lot. As a reward I gave myself leave to come in late on the Friday, and hit up "A $\kappa\chi$offee project". I had a beautiful iced filter coffee, the aromatics came through really clearly.
+
+![](pictures/coffee.jpg)
+
+## Running
+
+::: {#fig-interior layout-ncol="2"}
+
+![](./pictures/Trails/IMG_20220501_112851.jpg){#fig-trail-1}
+
+![](./pictures/Trails/IMG_20220501_113239.jpg){#fig-trail-2}
+
+![](./pictures/Trails/IMG_20220501_114536.jpg){#fig-trail-3}
+
+![](./pictures/Trails/IMG_20220503_094038.jpg){#fig-trail-4}
+
+![](./pictures/Trails/IMG_20220503_095946.jpg){#fig-trail-5}
+
+![](./pictures/Trails/IMG_20220503_103856.jpg){#fig-trail-6}
+
+![](./pictures/Trails/IMG_20220503_112028.jpg){#fig-trail-7}
+
+![](./pictures/Trails/IMG_20220503_120535.jpg){#fig-trail-8}
+
+![](./pictures/Trails/IMG_20220504_090211.jpg){#fig-trail-9}
+
+![](./pictures/Trails/IMG_20220504_094411.jpg){#fig-trail-10}
+
+![](./pictures/Trails/IMG_20220504_111813.jpg){#fig-trail-12}
+
+![](./pictures/Trails/IMG_20220504_120055.jpg){#fig-trail-14}
+
+![](./pictures/Trails/IMG_20220504_121401.jpg){#fig-trail-15}
+
+![](./pictures/Trails/IMG_20220504_123721.jpg){#fig-trail-16}
+
+![](./pictures/Trails/IMG_20220504_125317.jpg){#fig-trail-17}
+
+![](./pictures/Trails/IMG_20220504_150925.jpg){#fig-trail-19}
+
+![](./pictures/Trails/IMG_20220504_151236.jpg){#fig-trail-20}
+
+![](./pictures/Trails/IMG_20220504_153431.jpg){#fig-trail-21}
+
+![](./pictures/Trails/IMG_20220504_125330.jpg){#fig-trail-18}
+
+![](./pictures/Trails/IMG_20220504_154005.jpg){#fig-trail-22}
+
+![](./pictures/Trails/IMG_20220504_155054.jpg){#fig-trail-23}
+
+![](./pictures/Trails/IMG_20220504_160950.jpg){#fig-trail-24}
+
+![](./pictures/Trails/IMG_20220504_171843.jpg){#fig-trail-25}
+
+![](./pictures/Trails/vibrams_1.jpg){#fig-trail-27}
+
+
+Trails in the interior
+:::
+
+## Cats
+
+Cyprus aslo has many stray cats. Here are some.
+
+::: {#fig-cats layout-ncol="2"}
+
+![](./pictures/Cats/c.jpg){#fig-cat-1}
+
+![](./pictures/Cats/IMG_20220430_145113.jpg){#fig-cat-2}
+
+![](./pictures/Cats/IMG_20220430_193030.jpg){#fig-cat-3}
+
+![](./pictures/Cats/IMG_20220505_132039.jpg){#fig-cat-4}
+
+![](./pictures/Cats/IMG_20220505_180313.jpg){#fig-cat-5}
+
+![](./pictures/Cats/IMG_20220505_184135.jpg){#fig-cat-6}
+
+The cats of Cyprus
+
+:::

@@ -1,6 +1,7 @@
 ---
 title: "Circumventing poor mixing in Bayesian model-based clustering"
 editor: visual
+data: 2022-08-01
 categories: [Bayes]
 bibliography: cc.bib
 ---
