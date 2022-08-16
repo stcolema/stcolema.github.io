@@ -55,8 +55,23 @@ I found the conference very wearing though; I'm not fluent in BNP, the travel to
 
 ## Running
 
-::: {#fig-interior layout-ncol="2"}
+```{r column: screen}
+library(leaflet)
+leaflet() %>%
+  addTiles() %>%
+  addMarkers(
+    lng=32.863873641417335, 
+    lat=34.936726200280894, 
+    label="Mt. Olympus"
+  ) %>% 
+  addProviderTiles(providers$CartoDB.Positron)
+```
 
+The running was great. I bussed down to Kyperounta, did the Madari Circular trail, slept, walked/ran to Pedoulas via Artemis Lake (a let down). Pedoulas was pleasant, but this entire day was spent going uphill essentially so I was destroyed. Pedoulas to Pano Platres, Millomeris Waterfall, Caledonian Waterfall, etc. 
+
+![The friendly locals of Pedoulas.](./pictures/dog.jpg)
+
+::: {#fig-interior layout-ncol="2"}
 ![](./pictures/Trails/IMG_20220501_112851.jpg){#fig-trail-1}
 
 ![](./pictures/Trails/IMG_20220501_113239.jpg){#fig-trail-2}
@@ -105,7 +120,6 @@ I found the conference very wearing though; I'm not fluent in BNP, the travel to
 
 ![](./pictures/Trails/vibrams_1.jpg){#fig-trail-27}
 
-
 Trails in the interior
 :::
 
@@ -114,7 +128,6 @@ Trails in the interior
 Cyprus aslo has many stray cats. Here are some.
 
 ::: {#fig-cats layout-ncol="2"}
-
 ![](./pictures/Cats/c.jpg){#fig-cat-1}
 
 ![](./pictures/Cats/IMG_20220430_145113.jpg){#fig-cat-2}
@@ -128,5 +141,4 @@ Cyprus aslo has many stray cats. Here are some.
 ![](./pictures/Cats/IMG_20220505_184135.jpg){#fig-cat-6}
 
 The cats of Cyprus
-
 :::
