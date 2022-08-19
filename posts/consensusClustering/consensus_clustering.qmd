@@ -548,7 +548,7 @@ mean_abs_diff_df |>
 ```
 
 
-# Bayesian
+# How Bayesian are we?
 
 I am interested in how well the consensus clustering approximates a well-behaved chain. Let's investigate this in a dataset where mixing will not be an issue. We'll run a number of chains on a two-dimensional dataset with well separate clusters and compare this to a consensus clustering of the same dataset. In both the short and long chains we will use longer chains than we need.
 
@@ -650,4 +650,4 @@ p1 / p2 +
   plot_layout(guides = "collect")
 ```
 
-It appears that consensus clustering can describe the posterior distribution quite well, placing an appropriate amount of mass on each potential partition.
+It appears that consensus clustering can describe the posterior distribution quite well, placing an appropriate amount of mass on each potential partition. I don't think this is sufficient proof to claim that the inference performed using many short chains is truly Bayesian, but it is a close approximation in any of the cases I have looked into.
