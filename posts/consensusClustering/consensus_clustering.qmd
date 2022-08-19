@@ -546,3 +546,108 @@ mean_abs_diff_df |>
   labs(title = "Assessing stability across cms for increasing numbers of chains") +
   ggthemes::scale_color_colorblind()
 ```
+
+
+# Bayesian
+
+I am interested in how well the consensus clustering approximates a well-behaved chain. Let's investigate this in a dataset where mixing will not be an issue. We'll run a number of chains on a two-dimensional dataset with well separate clusters and compare this to a consensus clustering of the same dataset. In both the short and long chains we will use longer chains than we need.
+
+```{r 2d, cache=TRUE}
+
+N_2d <- 200
+P_2d <- 2
+
+data_2d <- MDIr::generateGaussianDataset(cluster_means = c(-2, 2), 
+  std_dev = c(1, 1), 
+  n = N_2d, 
+  p = P_2d, 
+  pi = c(0.5, 0.5)
+)
+
+D <- 500
+W <- 1000
+
+alloc_mat <- matrix(0, nrow = W, ncol = N_2d)
+
+for(w in seq(1, W)) {
+  .mcmc <- callMixtureModel(data_2d$data, D, thin = D, type = "G", K = 50)
+  alloc_mat[w, ] <- .mcmc$allocations[2 , ]
+}
+
+cm <- createSimilarityMat(alloc_mat)
+
+n_chains <- 7
+R <- 2.5e4
+thin <- 25
+burn <- 1e4
+
+psms <- list()
+
+for(ii in seq(1, n_chains)) {
+  .mcmc <- callMixtureModel(data_2d$data, R, thin, type = "G", K = 50)
+  psms[[ii]] <- createSimilarityMat(.mcmc$allocations[-seq(1, burn / thin), ])
+}
+
+psms[[n_chains + 1]] <- cm
+
+```
+
+If we compare these PSMs and the consensus matrix we see that they all look very similar.
+
+```{r 2dviz}
+
+psm_df <- prepSimilarityMatricesForGGplot(psms)
+
+top_matrices <- psm_df |> 
+  filter(Chain %in% c(n_chains, n_chains + 1)) |> 
+    mutate(Type = case_when(
+      Chain == n_chains ~ paste("Chain", n_chains),
+      Chain == n_chains + 1 ~ paste0("CC(", D, ", ", W, ")" )
+    )
+  )
+
+bottom_matrices <- psm_df |> 
+  filter(Chain %in% seq(1, n_chains - 1)) |> 
+  mutate(Type = paste0("Chain ", Chain))
+
+p1 <- top_matrices |>
+  ggplot(aes(x = x, y = y, fill = Entry)) +
+  geom_tile() +
+  facet_wrap(~Type) +
+  scale_fill_gradient(low = "#FFFFFF", high = "#146EB4") +
+  labs(x = "Item", y = "Item", fill = "Coclustering\nproportion") +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank(),
+    axis.title.y = element_text(size = 10.5),
+    axis.title.x = element_text(size = 10.5),
+    plot.title = element_text(size = 18, face = "bold"),
+    plot.subtitle = element_text(size = 14),
+    strip.text.x = element_text(size = 10.5),
+    legend.text = element_text(size = 10.5)
+  )
+
+p2 <- bottom_matrices |>
+  ggplot(aes(x = x, y = y, fill = Entry)) +
+  geom_tile() +
+  facet_wrap(~Type, nrow = 2) +
+  scale_fill_gradient(low = "#FFFFFF", high = "#146EB4") +
+  labs(x = "Item", y = "Item", fill = "Coclustering\nproportion") +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank(),
+    axis.title.y = element_text(size = 10.5),
+    axis.title.x = element_text(size = 10.5),
+    plot.title = element_text(size = 18, face = "bold"),
+    plot.subtitle = element_text(size = 14),
+    strip.text.x = element_text(size = 10.5),
+    legend.text = element_text(size = 10.5)
+  )
+  
+p1 / p2 +
+  plot_layout(guides = "collect")
+```
+
+It appears that consensus clustering can describe the posterior distribution quite well, placing an appropriate amount of mass on each potential partition.

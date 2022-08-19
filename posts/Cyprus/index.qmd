@@ -67,7 +67,7 @@ leaflet() %>%
   addProviderTiles(providers$CartoDB.Positron)
 ```
 
-The running was great. I bussed down to Kyperounta, did the Madari Circular trail, slept, walked/ran to Pedoulas via Artemis Lake (a let down). Pedoulas was pleasant, but this entire day was spent going uphill essentially so I was destroyed. Pedoulas to Pano Platres, Millomeris Waterfall, Caledonian Waterfall, etc. 
+The running was great. I bussed down to Kyperounta, did the Madari Circular trail, slept, walked/ran to Pedoulas via Artemis Lake (a let down). Pedoulas was pleasant, but this entire day was spent going uphill essentially so I was destroyed. Pedoulas to Pano Platres, Millomeris Waterfall, Caledonian Waterfall, etc.
 
 ![The friendly locals of Pedoulas.](./pictures/dog.jpg)
 
