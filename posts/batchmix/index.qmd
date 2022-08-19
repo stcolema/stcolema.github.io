@@ -1,21 +1,20 @@
 ---
 title: "batchmix: Bayesian mixture modelling for multi-batch data"
 editor: visual
-data: 2022-08-01
+data: 2022-09-01
 categories: [Bayes]
 bibliography: batchmix.bib
 ---
 
 My R package, batchmix, finally landed on [CRAN](https://cran.r-project.org/web/packages/batchmix/index.html). This implements the models described in my paper [@Coleman2022BatchModel], mixture models aimed at accounting for batch effects.
 
-The model is very similar to the COMBAT algorithm of @JohnsonAdjustingbatcheffects2007, but infers batch effects and class at the same time. This makes the method semi-supervised as it uses the inferred labels to update class parameters. This offers some protection from unequal representation of class across batches which is nice. 
+The model is very similar to the COMBAT algorithm of @JohnsonAdjustingbatcheffects2007, but infers batch effects and class at the same time. This makes the method semi-supervised as it uses the inferred labels to update class parameters. This offers some protection from unequal representation of class across batches which is nice.
 
 This post will essentially recreate the vignette for the package showing how to use it.
 
-
 ## Data generation
 
-We simulate some data using the ``generateBatchData`` function.
+We simulate some data using the `generateBatchData` function.
 
 ```{r dataGen}
 library(ggplot2)
@@ -56,12 +55,7 @@ my_data <- generateBatchData(
 )
 ```
 
-This gives us a named list with two related datasets, the ``observed_data`` 
-which includes batch effects and the ``corrected_data`` which is batch-free. It
-also includes ``group_IDs``, a vector indicating class membership for each item,
-``batch_IDs``, which indicates batch of origin for each item, and ``fixed``,
-which indicates which labels are observed and fixed in the model. We pull these 
-out of the names list in the format that the modelling functions desire them.
+This gives us a named list with two related datasets, the `observed_data` which includes batch effects and the `corrected_data` which is batch-free. It also includes `group_IDs`, a vector indicating class membership for each item, `batch_IDs`, which indicates batch of origin for each item, and `fixed`, which indicates which labels are observed and fixed in the model. We pull these out of the names list in the format that the modelling functions desire them.
 
 ```{r dataClean}
 X <- my_data$observed_data
@@ -76,8 +70,7 @@ initial_labels <- generateInitialLabels(alpha, K, fixed, true_labels)
 
 ## Modelling
 
-Given some data, we are interested in modelling it. We assume here that the set
-of observed labels includes at least one example of each class in the data. 
+Given some data, we are interested in modelling it. We assume here that the set of observed labels includes at least one example of each class in the data.
 
 ```{r runMCMCChains, cache=TRUE}
 # Sampling parameters
@@ -108,13 +101,13 @@ We want to assess two things. First, how frequently the proposed parameters in t
 plotAcceptanceRates(mcmc_output)
 ```
 
-Secondly, we want to asses how well our chains have converged. To do this we plot the ``complete_likelihood`` of each chain. This is the quantity most relevant to a clustering/classification, being dependent on the labels. The ``observed_likelihood`` is independent of labels and more relevant for density estimation.
+Secondly, we want to asses how well our chains have converged. To do this we plot the `complete_likelihood` of each chain. This is the quantity most relevant to a clustering/classification, being dependent on the labels. The `observed_likelihood` is independent of labels and more relevant for density estimation.
 
 ```{r likelihood}
 plotLikelihoods(mcmc_output)
 ```
 
-We see that our chains disagree. We have to run them for more iterations. We use the ``continueChains`` function for this.
+We see that our chains disagree. We have to run them for more iterations. We use the `continueChains` function for this.
 
 ```{r continueChains, cache=TRUE}
 R_new <- 9000
