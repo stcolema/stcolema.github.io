@@ -234,9 +234,8 @@ div.csl-indent {
   <li><a href="#depth-tests" id="toc-depth-tests" class="nav-link" data-scroll-target="#depth-tests">Depth tests</a></li>
   <li><a href="#width-tests" id="toc-width-tests" class="nav-link" data-scroll-target="#width-tests">Width tests</a></li>
   <li><a href="#mean-abolute-difference-between-consensus-matrices" id="toc-mean-abolute-difference-between-consensus-matrices" class="nav-link" data-scroll-target="#mean-abolute-difference-between-consensus-matrices">Mean abolute difference between consensus matrices</a></li>
+  <li><a href="#bayesian" id="toc-bayesian" class="nav-link" data-scroll-target="#bayesian">Bayesian</a></li>
   </ul></li>
-  <li><a href="#how-bayesian-are-we" id="toc-how-bayesian-are-we" class="nav-link" data-scroll-target="#how-bayesian-are-we">How Bayesian are we?</a></li>
-  <li><a href="#model-mis-specification" id="toc-model-mis-specification" class="nav-link" data-scroll-target="#model-mis-specification">Model mis-specification</a></li>
   </ul>
 </nav>
 </nav>
@@ -892,10 +891,10 @@ Attaching package: 'dplyr'</code></pre>
 </div>
 </div>
 </section>
-</section>
-<section id="how-bayesian-are-we" class="level1">
-<h1>How Bayesian are we?</h1>
-<p>I am interested in how well the consensus clustering approximates a well-behaved chain. Let’s investigate this in a dataset where mixing will not be an issue. We’ll run a number of chains on a two-dimensional dataset with well separate clusters and compare this to a consensus clustering of the same dataset. In both the short and long chains we will use longer chains than we need.</p>
+<section id="bayesian" class="level2">
+<h2 class="anchored" data-anchor-id="bayesian">Bayesian</h2>
+<p>I am interested in how well the consensus clustering approximates the ergodic chain. Let’s investiage this in a dataset where mixing will not be an issue. We’ll run a number of chains on a two-dimensional dataset with well separate clusters and compare this to a consensus clustering of the same dataset. In both the short and long chains we will use longer chains than we need.</p>
+<p>COmpare to 2D</p>
 <div class="cell" data-hash="consensus_clustering_cache/html/2d_6bed1ecfb2a09b9ee1d7e85e5a5fbf3c">
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>N_2d <span class="ot">&lt;-</span> <span class="dv">200</span></span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>P_2d <span class="ot">&lt;-</span> <span class="dv">2</span></span>
@@ -933,7 +932,6 @@ Attaching package: 'dplyr'</code></pre>
 <span id="cb34-34"><a href="#cb34-34" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb34-35"><a href="#cb34-35" aria-hidden="true" tabindex="-1"></a>psms[[n_chains <span class="sc">+</span> <span class="dv">1</span>]] <span class="ot">&lt;-</span> cm</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>If we compare these PSMs and the consensus matrix we see that they all look very similar.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>psm_df <span class="ot">&lt;-</span> <span class="fu">prepSimilarityMatricesForGGplot</span>(psms)</span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -991,246 +989,10 @@ Attaching package: 'dplyr'</code></pre>
 <p><img src="consensus_clustering_files/figure-html/2dviz-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>It appears that consensus clustering can describe the posterior distribution quite well, placing an appropriate amount of mass on each potential partition. I don’t think this is sufficient proof to claim that the inference performed using many short chains is truly Bayesian, but it is a close approximation in any of the cases I have looked into. I can imagine settings with poor mixing where using a uniform weighting of MCMC samples ends up placing the wrong mass on the partitions and using some function of the marginal likelihood might be more appropriate, but figuring out the function and the complexity of calculating it might not be worthwhile longterm. Also, I have the impression that uniform weights for averaging across models can be better in terms of prediction or how well it describes unseen data, so even if this heuristic can fail to recover the true posterior, its usefulness might be better than if it had.</p>
+
+
+
 </section>
-<section id="model-mis-specification" class="level1">
-<h1>Model mis-specification</h1>
-<p>I am curious how the consensus clustering approach to inference protects us from model mis-specification. In moodel-based clustering, there’s good evidence that we can end up with an excess of clusters as the mixture model fits the dataset density. However, I suspect that the exact membership of these should be random; close items should cocluster, but the specific partition should be highly varying or dependent upon initialisation. By taking many independent partitions via consensus clustering, I hope that we will average over the random clusters that are present due to misspecification and end up with a less overfitted model.</p>
-<p>Lets check this using data generated like so:</p>
-<p><span class="math display">\[\begin{align}
-Y_n &amp;\sim Pois(\lambda_k), \\
-\epsilon_n &amp;\sim \mathcal{N}(0, 1), \\
-X_n &amp;= log(Y_n) + \epsilon_n.
-\end{align}\]</span></p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>generateLogPoissonData <span class="ot">&lt;-</span> <span class="cf">function</span>(lambdas, N, P, labels,</span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">row_names =</span> <span class="fu">paste0</span>(<span class="st">"Person_"</span>, <span class="fu">seq</span>(<span class="dv">1</span>, N)),</span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">col_names =</span> <span class="fu">paste0</span>(<span class="st">"Gene_"</span>, <span class="fu">seq</span>(<span class="dv">1</span>, P))) {</span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  classes <span class="ot">&lt;-</span> <span class="fu">unique</span>(labels)</span>
-<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>  gen_data <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">0</span>, N, P)</span>
-<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (p <span class="cf">in</span> <span class="fu">seq</span>(<span class="dv">1</span>, P)) {</span>
-<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>    lambdas_p <span class="ot">&lt;-</span> <span class="fu">sample</span>(lambdas)</span>
-<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (k <span class="cf">in</span> classes) {</span>
-<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>      class_inds <span class="ot">&lt;-</span> <span class="fu">which</span>(labels <span class="sc">==</span> k)</span>
-<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>      n_k <span class="ot">&lt;-</span> <span class="fu">length</span>(class_inds)</span>
-<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>      gen_data[class_inds, p] <span class="ot">&lt;-</span> <span class="fu">log</span>(<span class="fl">1.0</span> <span class="sc">+</span> <span class="fu">rpois</span>(n_k, lambdas_p[k])) <span class="sc">+</span> <span class="fu">rnorm</span>(n_k)</span>
-<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">row.names</span>(gen_data) <span class="ot">&lt;-</span> row_names</span>
-<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">colnames</span>(gen_data) <span class="ot">&lt;-</span> col_names</span>
-<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a>  gen_data <span class="ot">&lt;-</span> <span class="fu">scale</span>(gen_data)</span>
-<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a>  gen_data</span>
-<span id="cb36-18"><a href="#cb36-18" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb36-19"><a href="#cb36-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-20"><a href="#cb36-20" aria-hidden="true" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="dv">1250</span></span>
-<span id="cb36-21"><a href="#cb36-21" aria-hidden="true" tabindex="-1"></a>P <span class="ot">&lt;-</span> <span class="dv">5</span></span>
-<span id="cb36-22"><a href="#cb36-22" aria-hidden="true" tabindex="-1"></a>K <span class="ot">&lt;-</span> <span class="dv">5</span></span>
-<span id="cb36-23"><a href="#cb36-23" aria-hidden="true" tabindex="-1"></a>rates <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">15</span>, <span class="dv">25</span>, <span class="dv">40</span>, <span class="dv">75</span>)</span>
-<span id="cb36-24"><a href="#cb36-24" aria-hidden="true" tabindex="-1"></a>class_weights <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.4</span>, <span class="fl">0.2</span>, <span class="fl">0.2</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>)</span>
-<span id="cb36-25"><a href="#cb36-25" aria-hidden="true" tabindex="-1"></a>labels <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">seq</span>(<span class="dv">1</span>, K), <span class="at">size =</span> N, <span class="at">replace =</span> <span class="cn">TRUE</span>, <span class="at">prob =</span> class_weights)</span>
-<span id="cb36-26"><a href="#cb36-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-27"><a href="#cb36-27" aria-hidden="true" tabindex="-1"></a>lp_data <span class="ot">&lt;-</span> <span class="fu">generateLogPoissonData</span>(rates, N, P, labels)</span>
-<span id="cb36-28"><a href="#cb36-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-29"><a href="#cb36-29" aria-hidden="true" tabindex="-1"></a><span class="fu">annotatedHeatmap</span>(lp_data, labels, </span>
-<span id="cb36-30"><a href="#cb36-30" aria-hidden="true" tabindex="-1"></a>  <span class="at">show_rownames =</span> <span class="cn">FALSE</span>, </span>
-<span id="cb36-31"><a href="#cb36-31" aria-hidden="true" tabindex="-1"></a>  <span class="at">show_colnames =</span> <span class="cn">FALSE</span>, </span>
-<span id="cb36-32"><a href="#cb36-32" aria-hidden="true" tabindex="-1"></a>  <span class="at">main =</span> <span class="st">"Log-Poisson data"</span></span>
-<span id="cb36-33"><a href="#cb36-33" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<p><img src="consensus_clustering_files/figure-html/logpoisson_data-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-<p>Let’s fit several long chains.</p>
-<div class="cell" data-hash="consensus_clustering_cache/html/LP_long_chains_49dc935e286fe954bb4b200295d7ef08">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>n_chains <span class="ot">&lt;-</span> <span class="dv">3</span></span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>R <span class="ot">&lt;-</span> <span class="dv">10000</span></span>
-<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>thin <span class="ot">&lt;-</span> <span class="dv">50</span></span>
-<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>type <span class="ot">&lt;-</span> <span class="st">"G"</span></span>
-<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>iterations_initial <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, R, thin)</span>
-<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>n_samples <span class="ot">&lt;-</span> <span class="fu">floor</span>(R <span class="sc">/</span> thin) <span class="sc">+</span> <span class="dv">1</span></span>
-<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>type <span class="ot">&lt;-</span> <span class="st">"G"</span></span>
-<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>psms <span class="ot">&lt;-</span> lp_mcmc <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">"list"</span>, n_chains)</span>
-<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>likelihood_df <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">0</span>, <span class="at">nrow =</span> n_samples <span class="sc">-</span> <span class="dv">1</span>, <span class="at">ncol =</span> n_chains)</span>
-<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(likelihood_df) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"Chain"</span>, <span class="fu">seq</span>(<span class="dv">1</span>, n_chains))</span>
-<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>ari_mat <span class="ot">&lt;-</span> concentration_df <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">0</span>, <span class="at">nrow =</span> n_samples, <span class="at">ncol =</span> n_chains)</span>
-<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(ari_mat) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(concentration_df) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"Chain"</span>, <span class="fu">seq</span>(<span class="dv">1</span>, n_chains))</span>
-<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a>ensemble_psm <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">0</span>, <span class="at">nrow =</span> N, <span class="at">ncol =</span> N)</span>
-<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (ii <span class="cf">in</span> <span class="fu">seq</span>(<span class="dv">1</span>, n_chains)) {</span>
-<span id="cb37-20"><a href="#cb37-20" aria-hidden="true" tabindex="-1"></a>  lp_mcmc[[ii]] <span class="ot">&lt;-</span> .mcmc <span class="ot">&lt;-</span> <span class="fu">callMixtureModel</span>(lp_data, R, thin, type)</span>
-<span id="cb37-21"><a href="#cb37-21" aria-hidden="true" tabindex="-1"></a>  likelihood_df[, ii] <span class="ot">&lt;-</span> .mcmc<span class="sc">$</span>complete_likelihood[<span class="sc">-</span><span class="dv">1</span>]</span>
-<span id="cb37-22"><a href="#cb37-22" aria-hidden="true" tabindex="-1"></a>  concentration_df[, ii] <span class="ot">&lt;-</span> .mcmc<span class="sc">$</span>mass</span>
-<span id="cb37-23"><a href="#cb37-23" aria-hidden="true" tabindex="-1"></a>  ari_mat[, ii] <span class="ot">&lt;-</span> <span class="fu">apply</span>(.mcmc<span class="sc">$</span>allocations, <span class="dv">1</span>, <span class="cf">function</span>(x) {mcclust<span class="sc">::</span><span class="fu">arandi</span>(x, .mcmc<span class="sc">$</span>allocations[n_samples, ])})</span>
-<span id="cb37-24"><a href="#cb37-24" aria-hidden="true" tabindex="-1"></a>  .psm <span class="ot">&lt;-</span> <span class="fu">makePSM</span>(lp_mcmc[[ii]]<span class="sc">$</span>allocations)</span>
-<span id="cb37-25"><a href="#cb37-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">row.names</span>(.psm) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(.psm) <span class="ot">&lt;-</span> <span class="fu">row.names</span>(lp_data)</span>
-<span id="cb37-26"><a href="#cb37-26" aria-hidden="true" tabindex="-1"></a>  psms[[ii]] <span class="ot">&lt;-</span> .psm</span>
-<span id="cb37-27"><a href="#cb37-27" aria-hidden="true" tabindex="-1"></a>  ensemble_psm <span class="ot">&lt;-</span> ensemble_psm <span class="sc">+</span> .psm</span>
-<span id="cb37-28"><a href="#cb37-28" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb37-29"><a href="#cb37-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-30"><a href="#cb37-30" aria-hidden="true" tabindex="-1"></a>lp_psm_df <span class="ot">&lt;-</span> <span class="fu">prepSimilarityMatricesForGGplot</span>(psms)</span>
-<span id="cb37-31"><a href="#cb37-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-32"><a href="#cb37-32" aria-hidden="true" tabindex="-1"></a>lp_psm_df <span class="sc">|&gt;</span></span>
-<span id="cb37-33"><a href="#cb37-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">fill =</span> Entry)) <span class="sc">+</span></span>
-<span id="cb37-34"><a href="#cb37-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>() <span class="sc">+</span></span>
-<span id="cb37-35"><a href="#cb37-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Chain) <span class="sc">+</span></span>
-<span id="cb37-36"><a href="#cb37-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient</span>(</span>
-<span id="cb37-37"><a href="#cb37-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">low =</span> <span class="st">"#FFFFFF"</span>,</span>
-<span id="cb37-38"><a href="#cb37-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">high =</span> <span class="st">"#146EB4"</span></span>
-<span id="cb37-39"><a href="#cb37-39" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb37-40"><a href="#cb37-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"PSMs for log-poisson data"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<p><img src="consensus_clustering_files/figure-html/LP_long_chains-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>D_considered <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">100</span>, <span class="dv">250</span>, <span class="dv">500</span>)</span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>D <span class="ot">&lt;-</span> <span class="fu">max</span>(D_considered)</span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>number_depths <span class="ot">&lt;-</span> <span class="fu">length</span>(D_considered)</span>
-<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>W_considered <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">25</span>, <span class="dv">50</span>, <span class="dv">100</span>, <span class="dv">200</span>)</span>
-<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>W <span class="ot">&lt;-</span> <span class="fu">max</span>(W_considered)</span>
-<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>number_chains <span class="ot">&lt;-</span> <span class="fu">length</span>(W_considered)</span>
-<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>models <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(D_considered, W_considered)</span>
-<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(models) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Depth"</span>, <span class="st">"Width"</span>)</span>
-<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>n_models <span class="ot">&lt;-</span> <span class="fu">nrow</span>(models)</span>
-<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>thin <span class="ot">&lt;-</span> <span class="dv">50</span></span>
-<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>iterations <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, D, thin)</span>
-<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-16"><a href="#cb38-16" aria-hidden="true" tabindex="-1"></a>allocation_list <span class="ot">&lt;-</span> consensus_chains <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">"list"</span>, W)</span>
-<span id="cb38-17"><a href="#cb38-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-18"><a href="#cb38-18" aria-hidden="true" tabindex="-1"></a>consensus_matrix <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">0</span>, <span class="at">nrow =</span> N, <span class="at">ncol =</span> N)</span>
-<span id="cb38-19"><a href="#cb38-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-20"><a href="#cb38-20" aria-hidden="true" tabindex="-1"></a>consensus_matrices <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">"list"</span>, n_models)</span>
-<span id="cb38-21"><a href="#cb38-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-22"><a href="#cb38-22" aria-hidden="true" tabindex="-1"></a>allocations <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">"list"</span>, <span class="fu">length</span>(D_considered))</span>
-<span id="cb38-23"><a href="#cb38-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-24"><a href="#cb38-24" aria-hidden="true" tabindex="-1"></a><span class="co"># account for saving of 0th iterations</span></span>
-<span id="cb38-25"><a href="#cb38-25" aria-hidden="true" tabindex="-1"></a>samples_extracted <span class="ot">&lt;-</span> (D_considered <span class="sc">/</span> thin) <span class="sc">+</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-hash="consensus_clustering_cache/html/LP_consensusModelling_02c62a7fb80ecd5558d665a2f60043f1">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (ii <span class="cf">in</span> <span class="fu">seq</span>(<span class="dv">1</span>, W)) {</span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  .mcmc <span class="ot">&lt;-</span> <span class="fu">callMixtureModel</span>(lp_data, D, thin, type)</span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (jj <span class="cf">in</span> <span class="fu">seq</span>(<span class="dv">1</span>, number_depths)) {</span>
-<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>    curr_d <span class="ot">&lt;-</span> D_considered[jj]</span>
-<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>    sample_used <span class="ot">&lt;-</span> samples_extracted[jj]</span>
-<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>    .alloc <span class="ot">&lt;-</span> .mcmc<span class="sc">$</span>allocations[sample_used, ]</span>
-<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>    .ll <span class="ot">&lt;-</span> .mcmc<span class="sc">$</span>complete_likelihood[sample_used]</span>
-<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>    .mass <span class="ot">&lt;-</span> .mcmc<span class="sc">$</span>mass[sample_used]</span>
-<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a>    .lkl_entry <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Complete_log_likelihood"</span> <span class="ot">=</span> .ll,</span>
-<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a>      <span class="st">"D"</span> <span class="ot">=</span> curr_d,</span>
-<span id="cb39-15"><a href="#cb39-15" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Chain"</span> <span class="ot">=</span> ii</span>
-<span id="cb39-16"><a href="#cb39-16" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb39-17"><a href="#cb39-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-18"><a href="#cb39-18" aria-hidden="true" tabindex="-1"></a>    .mass_entry <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb39-19"><a href="#cb39-19" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Mass"</span> <span class="ot">=</span> .mass,</span>
-<span id="cb39-20"><a href="#cb39-20" aria-hidden="true" tabindex="-1"></a>      <span class="st">"D"</span> <span class="ot">=</span> curr_d,</span>
-<span id="cb39-21"><a href="#cb39-21" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Chain"</span> <span class="ot">=</span> ii</span>
-<span id="cb39-22"><a href="#cb39-22" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb39-23"><a href="#cb39-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-24"><a href="#cb39-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (ii <span class="sc">==</span> <span class="dv">1</span>) {</span>
-<span id="cb39-25"><a href="#cb39-25" aria-hidden="true" tabindex="-1"></a>      allocations[[jj]] <span class="ot">&lt;-</span> .alloc</span>
-<span id="cb39-26"><a href="#cb39-26" aria-hidden="true" tabindex="-1"></a>      lkl_df <span class="ot">&lt;-</span> .lkl_entry</span>
-<span id="cb39-27"><a href="#cb39-27" aria-hidden="true" tabindex="-1"></a>      mass_df <span class="ot">&lt;-</span> .mass_entry</span>
-<span id="cb39-28"><a href="#cb39-28" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
-<span id="cb39-29"><a href="#cb39-29" aria-hidden="true" tabindex="-1"></a>      allocations[[jj]] <span class="ot">&lt;-</span> <span class="fu">rbind</span>(allocations[[jj]], .alloc)</span>
-<span id="cb39-30"><a href="#cb39-30" aria-hidden="true" tabindex="-1"></a>      lkl_df <span class="ot">&lt;-</span> <span class="fu">rbind</span>(lkl_df, .lkl_entry)</span>
-<span id="cb39-31"><a href="#cb39-31" aria-hidden="true" tabindex="-1"></a>      mass_df <span class="ot">&lt;-</span> <span class="fu">rbind</span>(mass_df, .mass_entry)</span>
-<span id="cb39-32"><a href="#cb39-32" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb39-33"><a href="#cb39-33" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb39-34"><a href="#cb39-34" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-hash="consensus_clustering_cache/html/LP_cms_345cd9b784a1b692de248b1d17575181">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>cms <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">"list"</span>, n_models)</span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (ii <span class="cf">in</span> <span class="fu">seq</span>(<span class="dv">1</span>, number_chains)) {</span>
-<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>  curr_w <span class="ot">&lt;-</span> W_considered[ii]</span>
-<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>  chains_used <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">1</span>, curr_w)</span>
-<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (jj <span class="cf">in</span> <span class="fu">seq</span>(<span class="dv">1</span>, number_depths)) {</span>
-<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>    curr_cm_index <span class="ot">&lt;-</span> (ii <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> number_depths <span class="sc">+</span> jj</span>
-<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>    curr_d <span class="ot">&lt;-</span> D_considered[jj]</span>
-<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>    .cm <span class="ot">&lt;-</span> <span class="fu">makePSM</span>(allocations[[jj]][chains_used, ])</span>
-<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">row.names</span>(.cm) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(.cm) <span class="ot">&lt;-</span> <span class="fu">row.names</span>(lp_data)</span>
-<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>    cms[[curr_cm_index]] <span class="ot">&lt;-</span> .cm</span>
-<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb40-16"><a href="#cb40-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb40-17"><a href="#cb40-17" aria-hidden="true" tabindex="-1"></a>cc_lst <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb40-18"><a href="#cb40-18" aria-hidden="true" tabindex="-1"></a>  <span class="st">"CMs"</span> <span class="ot">=</span> cms,</span>
-<span id="cb40-19"><a href="#cb40-19" aria-hidden="true" tabindex="-1"></a>  <span class="st">"likelihood_df"</span> <span class="ot">=</span> lkl_df,</span>
-<span id="cb40-20"><a href="#cb40-20" aria-hidden="true" tabindex="-1"></a>  <span class="st">"mass_df"</span> <span class="ot">=</span> mass_df,</span>
-<span id="cb40-21"><a href="#cb40-21" aria-hidden="true" tabindex="-1"></a>  <span class="st">"allocations"</span> <span class="ot">=</span> allocations</span>
-<span id="cb40-22"><a href="#cb40-22" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-hash="consensus_clustering_cache/html/LP_viz_cm_e4052a074847a6b258ca228362618f1f">
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">annotatedHeatmap</span>(psms[[<span class="dv">1</span>]], labels,</span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">col_pal =</span> <span class="fu">simColPal</span>(),</span>
-<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">my_breaks =</span> <span class="fu">defineBreaks</span>(<span class="fu">simColPal</span>(), <span class="at">lb =</span> <span class="dv">0</span>),</span>
-<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">main =</span> <span class="st">"PSM (chain 1) for log-poisson data annotated by true labelling"</span>,</span>
-<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">show_colnames =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">show_rownames =</span> <span class="cn">FALSE</span></span>
-<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<p><img src="consensus_clustering_files/figure-html/LP_viz_cm-1.png" class="img-fluid" width="672"></p>
-</div>
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">annotatedHeatmap</span>(cms[[n_models]], labels,</span>
-<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">col_pal =</span> <span class="fu">simColPal</span>(),</span>
-<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">my_breaks =</span> <span class="fu">defineBreaks</span>(<span class="fu">simColPal</span>(), <span class="at">lb =</span> <span class="dv">0</span>),</span>
-<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">main =</span> <span class="st">"CM for log-poisson data annotated by true labelling"</span>,</span>
-<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">show_colnames =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">show_rownames =</span> <span class="cn">FALSE</span></span>
-<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<p><img src="consensus_clustering_files/figure-html/LP_viz_cm-2.png" class="img-fluid" width="672"></p>
-</div>
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>cm_pred <span class="ot">&lt;-</span> mcclust<span class="sc">::</span><span class="fu">maxpear</span>(cms[[n_models]], <span class="at">max.k =</span> <span class="dv">25</span>)<span class="sc">$</span>cl</span>
-<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>psm_pred <span class="ot">&lt;-</span> mcclust<span class="sc">::</span><span class="fu">maxpear</span>(psms[[<span class="dv">1</span>]], <span class="at">max.k =</span> <span class="dv">25</span>)<span class="sc">$</span>cl</span>
-<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>perf_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Method"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="fu">paste0</span>(<span class="st">"CC("</span>, D, <span class="st">", "</span>, W, <span class="st">")"</span>), <span class="fu">paste0</span>(<span class="st">"Bayesian ("</span>, R, <span class="st">")"</span>)),</span>
-<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ARI"</span> <span class="ot">=</span> <span class="fu">c</span>(</span>
-<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>    mcclust<span class="sc">::</span><span class="fu">arandi</span>(labels, cm_pred),</span>
-<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>    mcclust<span class="sc">::</span><span class="fu">arandi</span>(labels, psm_pred)</span>
-<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(perf_df, <span class="at">caption =</span> <span class="st">"ARI for long chain vs consensus clustering on log-poisson data"</span>, <span class="at">digits =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<table class="table table-sm table-striped">
-<caption>ARI for long chain vs consensus clustering on log-poisson data</caption>
-<thead>
-<tr class="header">
-<th style="text-align: left;">Method</th>
-<th style="text-align: right;">ARI</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">CC(500, 200)</td>
-<td style="text-align: right;">0.404</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Bayesian (10000)</td>
-<td style="text-align: right;">0.421</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-
-
-
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
