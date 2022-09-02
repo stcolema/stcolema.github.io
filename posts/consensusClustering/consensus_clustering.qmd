@@ -650,4 +650,227 @@ p1 / p2 +
   plot_layout(guides = "collect")
 ```
 
-It appears that consensus clustering can describe the posterior distribution quite well, placing an appropriate amount of mass on each potential partition. I don't think this is sufficient proof to claim that the inference performed using many short chains is truly Bayesian, but it is a close approximation in any of the cases I have looked into.
+It appears that consensus clustering can describe the posterior distribution quite well, placing an appropriate amount of mass on each potential partition. I don't think this is sufficient proof to claim that the inference performed using many short chains is truly Bayesian, but it is a close approximation in any of the cases I have looked into. I can imagine settings with poor mixing where using a uniform weighting of MCMC samples ends up placing the wrong mass on the partitions and using some function of the marginal likelihood might be more appropriate, but figuring out the function and the complexity of calculating it might not be worthwhile longterm. Also, I have the impression that uniform weights for averaging across models can be better in terms of prediction or how well it describes unseen data, so even if this heuristic can fail to recover the true posterior, its usefulness might be better than if it had.
+
+# Model mis-specification
+
+I am curious how the consensus clustering approach to inference protects us from model mis-specification. In moodel-based clustering, there's good evidence that we can end up with an excess of clusters as the mixture model fits the dataset density. However, I suspect that the exact membership of these should be random; close items should cocluster, but the specific partition should be highly varying or dependent upon initialisation. By taking many independent partitions via consensus clustering, I hope that we will average over the random clusters that are present due to misspecification and end up with a less overfitted model.
+
+Lets check this using data generated like so:
+
+\begin{align}
+Y_n &\sim Pois(\lambda_k), \\
+\epsilon_n &\sim \mathcal{N}(0, 1), \\
+X_n &= log(Y_n) + \epsilon_n.
+\end{align}
+
+```{r logpoisson_data}
+
+
+generateLogPoissonData <- function(lambdas, N, P, labels,
+                                   row_names = paste0("Person_", seq(1, N)),
+                                   col_names = paste0("Gene_", seq(1, P))) {
+  classes <- unique(labels)
+  gen_data <- matrix(0, N, P)
+  for (p in seq(1, P)) {
+    lambdas_p <- sample(lambdas)
+    for (k in classes) {
+      class_inds <- which(labels == k)
+      n_k <- length(class_inds)
+      gen_data[class_inds, p] <- log(1.0 + rpois(n_k, lambdas_p[k])) + rnorm(n_k)
+    }
+  }
+  row.names(gen_data) <- row_names
+  colnames(gen_data) <- col_names
+  gen_data <- scale(gen_data)
+  gen_data
+}
+
+N <- 1250
+P <- 5
+K <- 5
+rates <- c(5, 15, 25, 40, 75)
+class_weights <- c(0.4, 0.2, 0.2, 0.1, 0.1)
+labels <- sample(seq(1, K), size = N, replace = TRUE, prob = class_weights)
+
+lp_data <- generateLogPoissonData(rates, N, P, labels)
+
+annotatedHeatmap(lp_data, labels, 
+  show_rownames = FALSE, 
+  show_colnames = FALSE, 
+  main = "Log-Poisson data"
+)
+
+```
+
+Let's fit several long chains.
+
+```{r LP_long_chains, cache=TRUE}
+
+n_chains <- 3
+R <- 10000
+thin <- 50
+type <- "G"
+iterations_initial <- seq(0, R, thin)
+
+n_samples <- floor(R / thin) + 1
+type <- "G"
+
+psms <- lp_mcmc <- vector("list", n_chains)
+likelihood_df <- matrix(0, nrow = n_samples - 1, ncol = n_chains)
+colnames(likelihood_df) <- paste0("Chain", seq(1, n_chains))
+
+ari_mat <- concentration_df <- matrix(0, nrow = n_samples, ncol = n_chains)
+colnames(ari_mat) <- colnames(concentration_df) <- paste0("Chain", seq(1, n_chains))
+
+ensemble_psm <- matrix(0, nrow = N, ncol = N)
+
+for (ii in seq(1, n_chains)) {
+  lp_mcmc[[ii]] <- .mcmc <- callMixtureModel(lp_data, R, thin, type)
+  likelihood_df[, ii] <- .mcmc$complete_likelihood[-1]
+  concentration_df[, ii] <- .mcmc$mass
+  ari_mat[, ii] <- apply(.mcmc$allocations, 1, function(x) {mcclust::arandi(x, .mcmc$allocations[n_samples, ])})
+  .psm <- makePSM(lp_mcmc[[ii]]$allocations)
+  row.names(.psm) <- colnames(.psm) <- row.names(lp_data)
+  psms[[ii]] <- .psm
+  ensemble_psm <- ensemble_psm + .psm
+}
+
+lp_psm_df <- prepSimilarityMatricesForGGplot(psms)
+
+lp_psm_df |>
+  ggplot(aes(x = x, y = y, fill = Entry)) +
+  geom_tile() +
+  facet_wrap(~Chain) +
+  scale_fill_gradient(
+    low = "#FFFFFF",
+    high = "#146EB4"
+  ) +
+  labs(title = "PSMs for log-poisson data")
+```
+
+
+
+```{r LP_consensusClustering}
+D_considered <- c(50, 100, 250, 500)
+D <- max(D_considered)
+number_depths <- length(D_considered)
+
+W_considered <- c(25, 50, 100, 200)
+W <- max(W_considered)
+number_chains <- length(W_considered)
+
+models <- expand.grid(D_considered, W_considered)
+colnames(models) <- c("Depth", "Width")
+n_models <- nrow(models)
+
+thin <- 50
+iterations <- seq(0, D, thin)
+
+allocation_list <- consensus_chains <- vector("list", W)
+
+consensus_matrix <- matrix(0, nrow = N, ncol = N)
+
+consensus_matrices <- vector("list", n_models)
+
+allocations <- vector("list", length(D_considered))
+
+# account for saving of 0th iterations
+samples_extracted <- (D_considered / thin) + 1
+```
+
+```{r LP_consensusModelling, cache = TRUE}
+for (ii in seq(1, W)) {
+  .mcmc <- callMixtureModel(lp_data, D, thin, type)
+
+  for (jj in seq(1, number_depths)) {
+    curr_d <- D_considered[jj]
+    sample_used <- samples_extracted[jj]
+
+    .alloc <- .mcmc$allocations[sample_used, ]
+    .ll <- .mcmc$complete_likelihood[sample_used]
+    .mass <- .mcmc$mass[sample_used]
+
+    .lkl_entry <- data.frame(
+      "Complete_log_likelihood" = .ll,
+      "D" = curr_d,
+      "Chain" = ii
+    )
+
+    .mass_entry <- data.frame(
+      "Mass" = .mass,
+      "D" = curr_d,
+      "Chain" = ii
+    )
+
+    if (ii == 1) {
+      allocations[[jj]] <- .alloc
+      lkl_df <- .lkl_entry
+      mass_df <- .mass_entry
+    } else {
+      allocations[[jj]] <- rbind(allocations[[jj]], .alloc)
+      lkl_df <- rbind(lkl_df, .lkl_entry)
+      mass_df <- rbind(mass_df, .mass_entry)
+    }
+  }
+}
+
+```
+
+```{r LP_cms, cache=TRUE}
+
+cms <- vector("list", n_models)
+
+for (ii in seq(1, number_chains)) {
+  curr_w <- W_considered[ii]
+  chains_used <- seq(1, curr_w)
+
+  for (jj in seq(1, number_depths)) {
+    curr_cm_index <- (ii - 1) * number_depths + jj
+
+    curr_d <- D_considered[jj]
+    .cm <- makePSM(allocations[[jj]][chains_used, ])
+    row.names(.cm) <- colnames(.cm) <- row.names(lp_data)
+    cms[[curr_cm_index]] <- .cm
+  }
+}
+
+cc_lst <- list(
+  "CMs" = cms,
+  "likelihood_df" = lkl_df,
+  "mass_df" = mass_df,
+  "allocations" = allocations
+)
+```
+
+```{r LP_viz_cm, cache=TRUE}
+annotatedHeatmap(psms[[1]], labels,
+  col_pal = simColPal(),
+  my_breaks = defineBreaks(simColPal(), lb = 0),
+  main = "PSM (chain 1) for log-poisson data annotated by true labelling",
+  show_colnames = FALSE,
+  show_rownames = FALSE
+)
+
+annotatedHeatmap(cms[[n_models]], labels,
+  col_pal = simColPal(),
+  my_breaks = defineBreaks(simColPal(), lb = 0),
+  main = "CM for log-poisson data annotated by true labelling",
+  show_colnames = FALSE,
+  show_rownames = FALSE
+)
+
+cm_pred <- mcclust::maxpear(cms[[n_models]], max.k = 25)$cl
+psm_pred <- mcclust::maxpear(psms[[1]], max.k = 25)$cl
+
+perf_df <- data.frame(
+  "Method" = c(paste0("CC(", D, ", ", W, ")"), paste0("Bayesian (", R, ")")),
+  "ARI" = c(
+    mcclust::arandi(labels, cm_pred),
+    mcclust::arandi(labels, psm_pred)
+  )
+)
+
+knitr::kable(perf_df, caption = "ARI for long chain vs consensus clustering on log-poisson data", digits = 3)
+
+```
