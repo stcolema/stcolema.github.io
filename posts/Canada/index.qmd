@@ -1,0 +1,20 @@
+---
+title: "Montreal - BAYSM and ISBA"
+editor: visual
+data: 2022-11-01
+categories: [Bayes]
+---
+
+## Summary
+
+I attended the BAyesian Young Statisticians Meeting (BAYSM) and the International Society for Bayesian Analysis in Montreal in June. BAYSM was great, despite intense jet lag, though the keynotes were three people who have all made significant contributions to (among other things) model-based clustering: Adrian Raftery, Sylvia Frühwirth-Schnatter and Amy Herring. Also, a number of people I'd met at the BNP meeting in Cyprus were in attendence which was a delight. This was two days and less than 100 people. ISBA was a much more intense affair. I think about 600 people attended in the end? It lasted the week and had very long and full days. Though I also only started sleeping correctly in the last two days, so my sleep deficit was pretty strong, so I might be overstating it.
+
+## BAYSM
+
+I really recommend BAYSM to any junior Bayesians. It was very well done and most of the speakers had clearly thought about making their work accessible so I enjoyed many of the talks which covered quite an array of subjects. I also spoke myself about my batch-correction method, so that was fun. I think my talk went down pretty well, certainly I got laughs at all the spots I had hoped to (and, more importantly, none of the spots I hadn't) and had some questions from both Amy and Sylvia which was cool. Jason Roy, the chair of my session, also some nice questions.
+
+From the other talks the two standouts for me were from [Bella Deutsch](https://isabelladeutsch.com/) and [Renato Berlinghieri](https://renatoberlinghieri.github.io/). Bella made me feel like an understood Hawke's Processes and Approximate Bayesian Computation for a few hours, her paper is on arXiv [@Deutsch2020ABCHawkes]. Renato had delightful slides and some very nice material in his talk about using Gaussian processes to model ocean currents.
+
+## ISBA
+
+I had a poster covering the same material as my BAYSM talk. My memory of ISBA is limited at this point, but some highlights include conversations with [Saif Syed](https://www.saifsyed.com/) and [Brian Trippe](https://briantrippe.com/) and a jazz evening where [Jordan Bryan](https://j-g-b.github.io/) and Dennis Niemann astounded us with their musicality.
