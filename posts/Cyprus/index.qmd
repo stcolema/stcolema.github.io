@@ -7,17 +7,17 @@ categories: [Bayes, coffee, running]
 
 ## Summary
 
-I attended the Bayesian Non-Parametrics Networking Event in Nicosia, Cyprus and then wandered around the interior of the island. An immense time.
+I attended the Bayesian Non-Parametric Networking Event in Nicosia, Cyprus and then wandered around the interior of the island. An immense time.
 
 Notes:
 
--   The BNP commmunity are very friendly depsite the intimdation factor of David Dunson, Aad van der Vaart and Judith Rousseau; I will attend as many of BNP events as possible in the future as is possible.
+-   The BNP community are very friendly despite the intimdation factor of David Dunson, Aad van der Vaart and Judith Rousseau; I will attend as many of BNP events as possible in the future as is possible.
 -   Cyprus is great and has more variety than I expect, but I'm very glad I wasn't there even two weeks later, too much sun for me.
 -   Rome2Rio is a fantastic app and made the trip into the interior feasible.
 
 ## Background
 
-I was delighted/massively intimidated to be offered a speaking slot at [the BNP Networking Event in Cyprus in April 2022](http://cyprusconferences.org/bnp2022/). I was delighted as Cyprus was meant to be great, but intimidated as my work wasn't really non-parametric or Bayesian and I knew from the agenda that Aad van der Vaart and Judith Rousseau would be there; two people who have provided immensely important and innovative contributions to Bayesian non-parametrics. David Dunson would also be going, but I figured David was likely to appreciate my work on pragmatic grounds, but stil, I was not without additional trepidation due to this factor - I'm a big fan of David's work, he's very smart and rejection would have been uncomfortable to say the least.
+I was delighted/massively intimidated to be offered a speaking slot at [the BNP Networking Event in Cyprus in April 2022](http://cyprusconferences.org/bnp2022/). I was delighted as Cyprus was meant to be great, but intimidated as my work wasn't really non-parametric (or arguably even Bayesian) and I knew from the agenda that Aad van der Vaart and Judith Rousseau would be there; two people who have provided immensely important and innovative contributions to Bayesian non-parametrics. David Dunson would also be going, but I figured David was likely to appreciate my work on pragmatic grounds, but still, I was not without additional trepidation due to this factor - I'm a big fan of David's work.
 
 Regardless, I was going and decided to try and do something I'd wanted to do for awhile, a running holiday. I planned to get a bus from Nicosa into the interior and basically circumvent the Cypriot Mt. Olympus (not to be confused with the Grecian or Martian mountains of the same name). So even if I had a crippling rejection from all of the academics I most admired I would probably have a nice time of it. My old Vibrams were wearing thin, so I presented myself with a pair of the new [V-trail 2.0](https://www.vibrams.co.uk/products/v-trail-2-0-mens-black) as I expected to be off-piste for a large chunk of the running. I was a little anxious that I hadn't broken them in enough as I expected to be going serious distance a day wearing a backpack; I had only done about 40km before heading out.
 
@@ -29,7 +29,7 @@ Thus, a holiday of Bayes, barefoot running and coffee was born.
 
 I got into Nicosia quite late the day before the conference began; I hadn't appreciated how far away Cyprus is, but the shuttle from Larnaca airport into Nicosia was cheap (I think 8 euro?) and pretty easy. I eventually got into my flat for the week which was down by Konstantinou & Elenis cemetary. I wanted to be near enough to both a park and the University where the conference was being hosted, and this fit the bill, as well as giving me some space where I could unwind, work and cook for myself.
 
-I displayed immense wisdom on the first morning. I didn't go out for a run and instead made an approximation of shakshouka. The day was already set-up to be intensely hot. Everyday in Nicosia would hover around the $30^o$C mark for a few hours around midday; thankfully the theatre the conference talks were in was plenty cool.
+I displayed immense wisdom on the first morning. I didn't go out for a run and instead made an approximation of shakshouka. The day was already set-up to be intensely hot (by my Irish standards at least). Everyday in Nicosia would hover around the $30^o$C mark for a few hours around midday; thankfully the theatre the conference talks were in was plenty cool.
 
 I think there was about 70 people in attendance in total, and it took awhile for everyone to trickle in. I was pretty excited for the tutorials, David would be opening and I had enjoyed [previous](https://www.youtube.com/watch?v=swC2i2h7R5Y) [talks](https://www.youtube.com/watch?v=UYp2GGo2KKU) [of](https://www.youtube.com/watch?v=ewUbZe7r4HA) [his](https://www.youtube.com/watch?v=1-_0X1AsrNk) (including [one](https://www.youtube.com/watch?v=scKQy9LdKhk) which I technically hosted), and his tutorial "Some musings on Bayesian non-parametrics" sounded open enough to accessible and interesting. I wasn't familiar with Yanxun Xu, but her work was very applied so I expected to enjoy it. I was not sure how much of Aad's tutorial I'd follow with a lack of technical background, but I was looking forward to the challenge as this is the man who wrote [the book](https://www-cambridge-org.ezp.lib.cam.ac.uk/gb/academic/subjects/statistics-probability/statistical-theory-and-methods/fundamentals-nonparametric-bayesian-inference?format=HB&isbn=9780521878265) on BNP.
 
@@ -45,11 +45,11 @@ Most of the talks were over my head throughout the conference, so I'm not going 
 -   [Mariia Vladimirova](https://sites.google.com/site/mrvladimirova), "[Bayesian Neural Networks at Finite and Infinite Widths](https://proceedings.mlr.press/v157/vladimirova21a.html)".
 -   Dennis Nieman, "[Contraction rates and uncertainty quantification for variational Bayes](https://www.jmlr.org/papers/volume23/21-1128/21-1128.pdf)".
 
-I unfortunately had to miss a set of talks to host an [online talk](https://www.youtube.com/watch?v=rUKuzhrHJE8) from [Trevor Campbell](https://trevorcampbell.me/) about his and his group's work on Bayesian coresets. This loss was mitigated by how great a talk Trevor gave. The work itself is very interesting (hence why I had been attempting to wrangle an invite to Trevor to speak for awhile), but Trevor has also clearly thought a lot about how to convey information and how to present his work, so I really enjoyed it.
+I unfortunately had to miss a set of talks to host an [online talk](https://www.youtube.com/watch?v=rUKuzhrHJE8) from [Trevor Campbell](https://trevorcampbell.me/) about his and his group's work on Bayesian coresets. This loss was mitigated by how great a talk Trevor gave. The work itself is very interesting (hence why I had been attempting to wrangle an invite to Trevor to speak for awhile), but Trevor has also clearly thought a lot about how to convey information and how to present his work.
 
 My own talk went down well, with both David and Sara Wade being particularly positive. It was really nice to have the opportunity to discuss the work a little with them both.
 
-I found the conference very wearing though; I'm not fluent in BNP, the travel to be there and as an autistic person that level of exposure to people was just a lot. As a reward I gave myself leave to come in late on the Friday, and hit up "A $\kappa\chi$offee project". I had a beautiful iced filter coffee, the aromatics came through really clearly.
+I found the conference very wearing though; I'm not fluent in BNP, the travel to be there and that level of exposure to people was just a lot. As a reward I gave myself leave to come in late on the Friday, and hit up "A $\kappa\chi$offee project". I had a beautiful iced filter coffee, the aromatics came through really clearly. One of the nicest coffees I have had.
 
 ![](pictures/coffee.jpg)
 
@@ -67,7 +67,7 @@ leaflet() %>%
   addProviderTiles(providers$CartoDB.Positron)
 ```
 
-The running was great. I bussed down to Kyperounta, did the Madari Circular trail, slept, walked/ran to Pedoulas via Artemis Lake (a let down). Pedoulas was pleasant, but this entire day was spent going uphill essentially so I was destroyed. Pedoulas to Pano Platres, Millomeris Waterfall, Caledonian Waterfall, etc.
+The running was great. I bussed down to Kyperounta, did the Madari Circular trail, slept, walked/ran to Pedoulas via Artemis Lake (which is really more a pond?). Pedoulas was pleasant, but this entire day was spent going uphill essentially so I was destroyed. Pedoulas to Pano Platres, Millomeris Waterfall, Caledonian Waterfall, etc. It was fascinating the range of terrains covered; there's varying soil types and access to water varies a lot with obvious consequences for the vegetations. There's some pictures below to convey this. I had an amazing time over these days, some of the most enjoyment I have had out of a holiday in a long time.
 
 ![The friendly locals of Pedoulas.](./pictures/dog.jpg)
 
