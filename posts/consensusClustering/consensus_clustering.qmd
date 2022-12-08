@@ -16,7 +16,7 @@ Paper: [Consensus Clustering for Bayesian Mixture Models](https://bmcbioinformat
 
 ## Introduction
 
-The first paper of my PhD was entitled "[Consensus Clustering for Bayesian Mixture Models](https://bmcbioinformatics-biomedcentral-com.ezp.lib.cam.ac.uk/articles/10.1186/s12859-022-04830-8)" and written with my supervisors Paul and Chris. I think that the paper is a little confused, but it covers some nice work. To overcome the issue of poor mixing that haunts Bayesian clustering, we proposed a heuristic method based on the consensus clustering algorithm of @Monti2003CC that appears to enable principled inference without reimplementing the sampler. However, the inference does lose the Bayesian interpretation.
+The first paper of my PhD was entitled "[Consensus Clustering for Bayesian Mixture Models](https://bmcbioinformatics-biomedcentral-com.ezp.lib.cam.ac.uk/articles/10.1186/s12859-022-04830-8)" and written with my supervisors Paul and Chris. To overcome the issue of poor mixing that haunts Bayesian clustering, we proposed a heuristic method based on the consensus clustering algorithm of @Monti2003CC that appears to enable principled inference without reimplementing the sampler. However, the inference does lose the Bayesian interpretation.
 
 If you have attempted to infer discrete latent structure using a Bayesian method implemented using Markov Chain Monte Carlo (*MCMC*) methods, then you've probably encountered the problem of poor mixing where chains become trapped in different clusterings and stop exploring the parameter space.There is a large body of literature about methods for navigating this problem in a principled fashion [see, e.g., @Dahl2003SplitMerge; @Jain2004SplitMerge; @Bouchard2017PGSM; @syed2021ScalablePT], but these state-of-the-art samplers tend to be time-consuming to implement. In this paper we proposed taking samples from many (relatively) short chains rather than a single long chain. This idea has seen a lot of mileage recently across a few different papers, but where we differ is we surrender our claim of being truly Bayesian. We have to do this as, while it is possibly that our samples are drawn from the target density, they are unlikely to be weighted correctly. However, we found that the expected values from the distributions sampled this way tended to be correct even if the variance might be too large.
 
@@ -51,25 +51,25 @@ Algorithm:
   }
 ```
 
-Obviously one can sample more quantities than just the clustering (as we do in the paper), but I think that clustering works particularly well with short chains. This is because we often care about co-clustering probabilities across sampled partitions rather than any single sample being correct; this means that if there is enough variety across a large number of poor (but better than random) sampled partitions we might still infer the correct structure. For other variables we need longer chains to have the correct expected value from our sampled distribution.
+Obviously one can sample more quantities than just the clustering (as we do in the paper), but I think that clustering works particularly well with short chains. This is because we often care about co-clustering probabilities across sampled partitions rather than any single sample being correct; this means that if there is enough variety across a large number of poor (but better than random) sampled partitions we might still infer the correct structure. For other variables we expect that we need longer chains to have the correct expected value from our sampled distribution. The Multiple Dataset Integration (*MDI*) example in the paper is a good example of this. MDI is an integrative or multi-view Bayesian clustering method. Signal is shared across datasets to inform clustering in each view and the degree to which information should be shared is also inferred. This is represented by the $\phi$ parameters in the model. To learn meaningful estimate of $\phi$ and infer dependent clusterings we need to go much further into the chains then we do for clustering a single dataset. This is because for the information to be shared and how it is shared depends on the global clustering structure emerging. This means that the Markov chains have to reach their target density for consensus clustering to offer a useful inference and the chains are long. This means we lose the massive speed gain that very short chains offer, but we still overcome the multi-modality so often present in the posterior distribution of complex latent structure models. Based on this result we suspect that the method generalises to any Bayesian model, but for this vignette I will only explore clustering of a single dataset.
 
 # How to use consensus clustering in practice for Bayesian methods
 
-In this post I want to show how to use consensus clustering. First, let's generate some data. I generate data with two overlapping clustering structures which emerge in different features (this aspect of the data is sometimes referred to as having two different views of the clustering). This ensures multi-modality is present. The data has 200 samples, 15 variables informing each clustering and 40 noise variables. The first clustering has 4 clusters, the second 9 that are (approximately) nested in the first less fine clustering.
+In this post I want to show how to use consensus clustering. First, let's generate some data. I generate data with two overlapping clustering structures which emerge in different features (this aspect of the data is sometimes referred to as having two different views of the clustering). This ensures multi-modality is present. The data has 200 samples, 15 variables informing each clustering and 40 noise variables. The first clustering has 4 clusters, the second 9 that are (approximately) nested in the first less resolved clustering.
 
 ```{r dataGen}
 
 # For ggplot2 theme and data simulation
-library(mdiHelpR)
+suppressPackageStartupMessages(library(mdiHelpR))
 
 # For mixture models
-library(MDIr)
+suppressPackageStartupMessages(library(MDIr))
 
-library(magrittr)
-library(patchwork)
-library(tidyr)
-library(ggplot2)
-library(dplyr)
+suppressPackageStartupMessages(library(magrittr))
+suppressPackageStartupMessages(library(patchwork))
+suppressPackageStartupMessages(library(tidyr))
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(dplyr))
 
 set.seed(1)
 setMyTheme()
@@ -215,6 +215,12 @@ ari_df |>
   geom_line() +
   ggthemes::scale_color_colorblind() +
   labs(title = "ARI between rth sampled partition and final sampled partition in each chains")
+```
+
+
+These long chains have stopped exploring new clusterings almost instantly. Two chains do one large change several thousand iterations into the sampler, but all chains find a partition similar to the final sampled partition within 1,000 iteration. The mass parameter takes awhile to converge, but this is sampled via Metropolis-Hastings, so this makes sense.
+
+```{r long_chains_psms}
 
 psm <- makePSM(.mcmc$allocations)
 row.names(psm) <- colnames(psm) <- row.names(my_data)
@@ -243,13 +249,12 @@ psm_df |>
   labs(title = "PSMs for initial chains with common ordering")
 ```
 
-These long chains have stopped exploring new clusterings almost instantly. The mass parameter takes awhile to converge, but this is sampled via Metropolis-Hastings, so this makes sense.
 
-These PSMs also show why nested $\hat{R}$ and coupling don't work for clustering. These methods assume that the different chains can eventually reach similar places; this is unlikely to happen in any reasonable length of time in even as low-dimensional an example as this (70 features; hardly low-dimensional in many settings, but that's one of the joys of 'omics).
+These PSMs also show why nested $\hat{R}$ and coupling don't work for clustering. These methods assume that the different chains can eventually reach similar places; this is unlikely to happen in any reasonable length of time in even as low-dimensional an example as this (70 features; hardly low-dimensional in many settings, but that's one of the joys of 'omics). These PSMs essentially binary, suggesting the same partition is sampled repeatedly; only chains 7 and 8 appear to capture any variety in the clusterings.
 
 # Consensus clustering
 
-Now having an idea that the chains have found whatever structure they are going to find by the 100th iteration, we run an ensemble of chains for an excessive 1,000 iterations.
+We now believe that the chains have found whatever structure they are going to find by the 100th iteration, we run an ensemble of chains for an excessive 1,000 iterations.
 
 ```{r consensusClustering}
 D_considered <- c(100, 300, 600, 1000)
@@ -428,9 +433,9 @@ The consensus matrices appear very stable from the smallest and shallowest ensem
 
 # Testing
 
-Testing for convergence in Bayesian inference is difficult. Tests/diagnostics can be split in two categories, within chain and across chain. Within chain stationarity is normally assessed heuristically via trace plots and using the Geweke tests (essentially a t-test between samples at different stages of the chain). For across chains, $\hat{R}$ dominates. Both of these have shortcomings; for example if a chain explore many modes in the posterior, the Geweke test and trace plots will suggest discarding it despite this being desirable behaviour in many settings (being a more depiction of the model uncertainty). Furthermore, when using the Geweke test we want to accept the null hypothesis which is just plain odd. As for $\hat{R}$, the authors make no claims on how strong a guarantee small values are and this has been the source of much discussion in recent literature with many improvements recommended [see @Vats2021Revisiting; @Vehtari2021RankNormalisation; @Moins2022LocalRhat]. <!-- Vats and Knudson, 2021](https://projecteuclid-org.ezp.lib.cam.ac.uk/journals/statistical-science/volume-36/issue-4/Revisiting-the-GelmanRubin-Diagnostic/10.1214/20-STS812.full); [Vehtari et al., 2021](https://projecteuclid-org.ezp.lib.cam.ac.uk/journals/bayesian-analysis/volume-16/issue-2/Rank-Normalization-Folding-and-Localization--An-Improved-R%cb%86-for/10.1214/20-BA1221.full); [Moins et al., 2022](https://arxiv.org/abs/2205.06694)). --> However, most practitioners still use the original form and the threshold of 1.1.
+Testing for convergence in Bayesian inference is difficult. Tests/diagnostics can be split in two categories, within chain and across chain. Within chain stationarity is normally assessed heuristically via trace plots and using the Geweke tests (essentially a t-test between samples at different stages of the chain). For across chains, $\hat{R}$ dominates. Both of these have shortcomings; for example if a chain explore many modes in the posterior, the Geweke test will suggest discarding it despite this being desirable behaviour in many settings (being a more full depiction of the model uncertainty). Furthermore, when using the Geweke test we want to accept the null hypothesis which is just plain odd. As for $\hat{R}$, the authors make no claims on how strong a guarantee small values are and this has been the source of much discussion in recent literature with many improvements recommended [see @Vats2021Revisiting; @Vehtari2021RankNormalisation; @Moins2022LocalRhat]. <!-- Vats and Knudson, 2021](https://projecteuclid-org.ezp.lib.cam.ac.uk/journals/statistical-science/volume-36/issue-4/Revisiting-the-GelmanRubin-Diagnostic/10.1214/20-STS812.full); [Vehtari et al., 2021](https://projecteuclid-org.ezp.lib.cam.ac.uk/journals/bayesian-analysis/volume-16/issue-2/Rank-Normalization-Folding-and-Localization--An-Improved-R%cb%86-for/10.1214/20-BA1221.full); [Moins et al., 2022](https://arxiv.org/abs/2205.06694)). --> However, most practitioners still use the original form and the threshold of 1.1.
 
-With this context I would like to argue that the inference from our proposed method can provide a better approximationof the target densitty than the approach of a single long chain. Our method is more likely to draw samples from the entire support of the posterior, but I suspect it is giving the wrong posterior density to the modes drawn which is the reason I would consider this inference non-Bayesian. However, the logic of convergence can still be applied in considering if we have used a sufficient quantity of chains and if they are of sufficient length. To do this, we would like to assess if the distribution of sampled parameters is not changing for increasing chain length and increasing numbers of chains. My belief is that if the behaviour has stabilised then the chains have reached their stationary distribution and the sample size across chains is sufficiently large to describe the posterior well. We have some disadvantages in that samples across chains are not ordered; however the origin of this property also means that we do not have to worry about auto-correlation across chains and therefore are more robust to multi-modal densities (the big reason to like this approach in my view). Below are two sections, `depth tests` and `width tests` that outline my approach to assessing these behaviours. Note that we must tests depth and width separately, much as we test within and across chain convergence separately.
+With this context I would like to argue that the inference from our proposed method can provide a better approximation of the target density than the approach of a single long chain. Our method is more likely to draw samples from the entire support of the posterior, but I suspect it is giving the wrong posterior density to the modes drawn which is the reason I would consider this inference non-Bayesian. However, the logic of convergence can still be applied in considering if we have used a sufficient quantity of chains and if they are of sufficient length. To do this, we would like to assess if the distribution of sampled parameters is not changing for increasing chain length and increasing numbers of chains. My belief is that if the behaviour has stabilised then the chains have reached their stationary distribution and the sample size across chains is sufficiently large to describe the posterior well. We have some disadvantages in that samples across chains are not ordered; however the origin of this property also means that we do not have to worry about auto-correlation across chains and therefore are more robust to multi-modal densities (the big reason to like this approach in my view). Below are two sections, `depth tests` and `width tests` that outline my approach to assessing these behaviours. Note that we must tests depth and width separately, much as we test within and across chain convergence separately.
 
 Note that I use t-tests, but we could use something that is more targeted to compare the sampled distributions rather than some summary statistic of them.
 
@@ -652,225 +657,225 @@ p1 / p2 +
 
 It appears that consensus clustering can describe the posterior distribution quite well, placing an appropriate amount of mass on each potential partition. I don't think this is sufficient proof to claim that the inference performed using many short chains is truly Bayesian, but it is a close approximation in any of the cases I have looked into. I can imagine settings with poor mixing where using a uniform weighting of MCMC samples ends up placing the wrong mass on the partitions and using some function of the marginal likelihood might be more appropriate, but figuring out the function and the complexity of calculating it might not be worthwhile longterm. Also, I have the impression that uniform weights for averaging across models can be better in terms of prediction or how well it describes unseen data, so even if this heuristic can fail to recover the true posterior, its usefulness might be better than if it had.
 
-# Model mis-specification
+<!-- # Model mis-specification -->
 
-I am curious how the consensus clustering approach to inference protects us from model mis-specification. In moodel-based clustering, there's good evidence that we can end up with an excess of clusters as the mixture model fits the dataset density. However, I suspect that the exact membership of these should be random; close items should cocluster, but the specific partition should be highly varying or dependent upon initialisation. By taking many independent partitions via consensus clustering, I hope that we will average over the random clusters that are present due to misspecification and end up with a less overfitted model.
+<!-- I am curious how the consensus clustering approach to inference protects us from model mis-specification. In moodel-based clustering, there's good evidence that we can end up with an excess of clusters as the mixture model fits the dataset density. However, I suspect that the exact membership of these should be random; close items should cocluster, but the specific partition should be highly varying or dependent upon initialisation. By taking many independent partitions via consensus clustering, I hope that we will average over the random clusters that are present due to misspecification and end up with a less overfitted model. -->
 
-Lets check this using data generated like so:
+<!-- Lets check this using data generated like so: -->
 
-\begin{align}
-Y_n &\sim Pois(\lambda_k), \\
-\epsilon_n &\sim \mathcal{N}(0, 1), \\
-X_n &= log(Y_n) + \epsilon_n.
-\end{align}
+<!-- \begin{align} -->
+<!-- Y_n &\sim Pois(\lambda_k), \\ -->
+<!-- \epsilon_n &\sim \mathcal{N}(0, 1), \\ -->
+<!-- X_n &= log(Y_n) + \epsilon_n. -->
+<!-- \end{align} -->
 
-```{r logpoisson_data}
-
-
-generateLogPoissonData <- function(lambdas, N, P, labels,
-                                   row_names = paste0("Person_", seq(1, N)),
-                                   col_names = paste0("Gene_", seq(1, P))) {
-  classes <- unique(labels)
-  gen_data <- matrix(0, N, P)
-  for (p in seq(1, P)) {
-    lambdas_p <- sample(lambdas)
-    for (k in classes) {
-      class_inds <- which(labels == k)
-      n_k <- length(class_inds)
-      gen_data[class_inds, p] <- log(1.0 + rpois(n_k, lambdas_p[k])) + rnorm(n_k)
-    }
-  }
-  row.names(gen_data) <- row_names
-  colnames(gen_data) <- col_names
-  gen_data <- scale(gen_data)
-  gen_data
-}
-
-N <- 1250
-P <- 5
-K <- 5
-rates <- c(5, 15, 25, 40, 75)
-class_weights <- c(0.4, 0.2, 0.2, 0.1, 0.1)
-labels <- sample(seq(1, K), size = N, replace = TRUE, prob = class_weights)
-
-lp_data <- generateLogPoissonData(rates, N, P, labels)
-
-annotatedHeatmap(lp_data, labels, 
-  show_rownames = FALSE, 
-  show_colnames = FALSE, 
-  main = "Log-Poisson data"
-)
-
-```
-
-Let's fit several long chains.
-
-```{r LP_long_chains, cache=TRUE}
-
-n_chains <- 3
-R <- 10000
-thin <- 50
-type <- "G"
-iterations_initial <- seq(0, R, thin)
-
-n_samples <- floor(R / thin) + 1
-type <- "G"
-
-psms <- lp_mcmc <- vector("list", n_chains)
-likelihood_df <- matrix(0, nrow = n_samples - 1, ncol = n_chains)
-colnames(likelihood_df) <- paste0("Chain", seq(1, n_chains))
-
-ari_mat <- concentration_df <- matrix(0, nrow = n_samples, ncol = n_chains)
-colnames(ari_mat) <- colnames(concentration_df) <- paste0("Chain", seq(1, n_chains))
-
-ensemble_psm <- matrix(0, nrow = N, ncol = N)
-
-for (ii in seq(1, n_chains)) {
-  lp_mcmc[[ii]] <- .mcmc <- callMixtureModel(lp_data, R, thin, type)
-  likelihood_df[, ii] <- .mcmc$complete_likelihood[-1]
-  concentration_df[, ii] <- .mcmc$mass
-  ari_mat[, ii] <- apply(.mcmc$allocations, 1, function(x) {mcclust::arandi(x, .mcmc$allocations[n_samples, ])})
-  .psm <- makePSM(lp_mcmc[[ii]]$allocations)
-  row.names(.psm) <- colnames(.psm) <- row.names(lp_data)
-  psms[[ii]] <- .psm
-  ensemble_psm <- ensemble_psm + .psm
-}
-
-lp_psm_df <- prepSimilarityMatricesForGGplot(psms)
-
-lp_psm_df |>
-  ggplot(aes(x = x, y = y, fill = Entry)) +
-  geom_tile() +
-  facet_wrap(~Chain) +
-  scale_fill_gradient(
-    low = "#FFFFFF",
-    high = "#146EB4"
-  ) +
-  labs(title = "PSMs for log-poisson data")
-```
+<!-- ```{r logpoisson_data} -->
 
 
+<!-- generateLogPoissonData <- function(lambdas, N, P, labels, -->
+<!--                                    row_names = paste0("Person_", seq(1, N)), -->
+<!--                                    col_names = paste0("Gene_", seq(1, P))) { -->
+<!--   classes <- unique(labels) -->
+<!--   gen_data <- matrix(0, N, P) -->
+<!--   for (p in seq(1, P)) { -->
+<!--     lambdas_p <- sample(lambdas) -->
+<!--     for (k in classes) { -->
+<!--       class_inds <- which(labels == k) -->
+<!--       n_k <- length(class_inds) -->
+<!--       gen_data[class_inds, p] <- log(1.0 + rpois(n_k, lambdas_p[k])) + rnorm(n_k) -->
+<!--     } -->
+<!--   } -->
+<!--   row.names(gen_data) <- row_names -->
+<!--   colnames(gen_data) <- col_names -->
+<!--   gen_data <- scale(gen_data) -->
+<!--   gen_data -->
+<!-- } -->
 
-```{r LP_consensusClustering}
-D_considered <- c(50, 100, 250, 500)
-D <- max(D_considered)
-number_depths <- length(D_considered)
+<!-- N <- 1250 -->
+<!-- P <- 5 -->
+<!-- K <- 5 -->
+<!-- rates <- c(5, 15, 25, 40, 75) -->
+<!-- class_weights <- c(0.4, 0.2, 0.2, 0.1, 0.1) -->
+<!-- labels <- sample(seq(1, K), size = N, replace = TRUE, prob = class_weights) -->
 
-W_considered <- c(25, 50, 100, 200)
-W <- max(W_considered)
-number_chains <- length(W_considered)
+<!-- lp_data <- generateLogPoissonData(rates, N, P, labels) -->
 
-models <- expand.grid(D_considered, W_considered)
-colnames(models) <- c("Depth", "Width")
-n_models <- nrow(models)
+<!-- annotatedHeatmap(lp_data, labels,  -->
+<!--   show_rownames = FALSE,  -->
+<!--   show_colnames = FALSE,  -->
+<!--   main = "Log-Poisson data" -->
+<!-- ) -->
 
-thin <- 50
-iterations <- seq(0, D, thin)
+<!-- ``` -->
 
-allocation_list <- consensus_chains <- vector("list", W)
+<!-- Let's fit several long chains. -->
 
-consensus_matrix <- matrix(0, nrow = N, ncol = N)
+<!-- ```{r LP_long_chains, cache=TRUE} -->
 
-consensus_matrices <- vector("list", n_models)
+<!-- n_chains <- 3 -->
+<!-- R <- 10000 -->
+<!-- thin <- 50 -->
+<!-- type <- "G" -->
+<!-- iterations_initial <- seq(0, R, thin) -->
 
-allocations <- vector("list", length(D_considered))
+<!-- n_samples <- floor(R / thin) + 1 -->
+<!-- type <- "G" -->
 
-# account for saving of 0th iterations
-samples_extracted <- (D_considered / thin) + 1
-```
+<!-- psms <- lp_mcmc <- vector("list", n_chains) -->
+<!-- likelihood_df <- matrix(0, nrow = n_samples - 1, ncol = n_chains) -->
+<!-- colnames(likelihood_df) <- paste0("Chain", seq(1, n_chains)) -->
 
-```{r LP_consensusModelling, cache = TRUE}
-for (ii in seq(1, W)) {
-  .mcmc <- callMixtureModel(lp_data, D, thin, type)
+<!-- ari_mat <- concentration_df <- matrix(0, nrow = n_samples, ncol = n_chains) -->
+<!-- colnames(ari_mat) <- colnames(concentration_df) <- paste0("Chain", seq(1, n_chains)) -->
 
-  for (jj in seq(1, number_depths)) {
-    curr_d <- D_considered[jj]
-    sample_used <- samples_extracted[jj]
+<!-- ensemble_psm <- matrix(0, nrow = N, ncol = N) -->
 
-    .alloc <- .mcmc$allocations[sample_used, ]
-    .ll <- .mcmc$complete_likelihood[sample_used]
-    .mass <- .mcmc$mass[sample_used]
+<!-- for (ii in seq(1, n_chains)) { -->
+<!--   lp_mcmc[[ii]] <- .mcmc <- callMixtureModel(lp_data, R, thin, type) -->
+<!--   likelihood_df[, ii] <- .mcmc$complete_likelihood[-1] -->
+<!--   concentration_df[, ii] <- .mcmc$mass -->
+<!--   ari_mat[, ii] <- apply(.mcmc$allocations, 1, function(x) {mcclust::arandi(x, .mcmc$allocations[n_samples, ])}) -->
+<!--   .psm <- makePSM(lp_mcmc[[ii]]$allocations) -->
+<!--   row.names(.psm) <- colnames(.psm) <- row.names(lp_data) -->
+<!--   psms[[ii]] <- .psm -->
+<!--   ensemble_psm <- ensemble_psm + .psm -->
+<!-- } -->
 
-    .lkl_entry <- data.frame(
-      "Complete_log_likelihood" = .ll,
-      "D" = curr_d,
-      "Chain" = ii
-    )
+<!-- lp_psm_df <- prepSimilarityMatricesForGGplot(psms) -->
 
-    .mass_entry <- data.frame(
-      "Mass" = .mass,
-      "D" = curr_d,
-      "Chain" = ii
-    )
+<!-- lp_psm_df |> -->
+<!--   ggplot(aes(x = x, y = y, fill = Entry)) + -->
+<!--   geom_tile() + -->
+<!--   facet_wrap(~Chain) + -->
+<!--   scale_fill_gradient( -->
+<!--     low = "#FFFFFF", -->
+<!--     high = "#146EB4" -->
+<!--   ) + -->
+<!--   labs(title = "PSMs for log-poisson data") -->
+<!-- ``` -->
 
-    if (ii == 1) {
-      allocations[[jj]] <- .alloc
-      lkl_df <- .lkl_entry
-      mass_df <- .mass_entry
-    } else {
-      allocations[[jj]] <- rbind(allocations[[jj]], .alloc)
-      lkl_df <- rbind(lkl_df, .lkl_entry)
-      mass_df <- rbind(mass_df, .mass_entry)
-    }
-  }
-}
 
-```
 
-```{r LP_cms, cache=TRUE}
+<!-- ```{r LP_consensusClustering} -->
+<!-- D_considered <- c(50, 100, 250, 500) -->
+<!-- D <- max(D_considered) -->
+<!-- number_depths <- length(D_considered) -->
 
-cms <- vector("list", n_models)
+<!-- W_considered <- c(25, 50, 100, 200) -->
+<!-- W <- max(W_considered) -->
+<!-- number_chains <- length(W_considered) -->
 
-for (ii in seq(1, number_chains)) {
-  curr_w <- W_considered[ii]
-  chains_used <- seq(1, curr_w)
+<!-- models <- expand.grid(D_considered, W_considered) -->
+<!-- colnames(models) <- c("Depth", "Width") -->
+<!-- n_models <- nrow(models) -->
 
-  for (jj in seq(1, number_depths)) {
-    curr_cm_index <- (ii - 1) * number_depths + jj
+<!-- thin <- 50 -->
+<!-- iterations <- seq(0, D, thin) -->
 
-    curr_d <- D_considered[jj]
-    .cm <- makePSM(allocations[[jj]][chains_used, ])
-    row.names(.cm) <- colnames(.cm) <- row.names(lp_data)
-    cms[[curr_cm_index]] <- .cm
-  }
-}
+<!-- allocation_list <- consensus_chains <- vector("list", W) -->
 
-cc_lst <- list(
-  "CMs" = cms,
-  "likelihood_df" = lkl_df,
-  "mass_df" = mass_df,
-  "allocations" = allocations
-)
-```
+<!-- consensus_matrix <- matrix(0, nrow = N, ncol = N) -->
 
-```{r LP_viz_cm, cache=TRUE}
-annotatedHeatmap(psms[[1]], labels,
-  col_pal = simColPal(),
-  my_breaks = defineBreaks(simColPal(), lb = 0),
-  main = "PSM (chain 1) for log-poisson data annotated by true labelling",
-  show_colnames = FALSE,
-  show_rownames = FALSE
-)
+<!-- consensus_matrices <- vector("list", n_models) -->
 
-annotatedHeatmap(cms[[n_models]], labels,
-  col_pal = simColPal(),
-  my_breaks = defineBreaks(simColPal(), lb = 0),
-  main = "CM for log-poisson data annotated by true labelling",
-  show_colnames = FALSE,
-  show_rownames = FALSE
-)
+<!-- allocations <- vector("list", length(D_considered)) -->
 
-cm_pred <- mcclust::maxpear(cms[[n_models]], max.k = 25)$cl
-psm_pred <- mcclust::maxpear(psms[[1]], max.k = 25)$cl
+<!-- # account for saving of 0th iterations -->
+<!-- samples_extracted <- (D_considered / thin) + 1 -->
+<!-- ``` -->
 
-perf_df <- data.frame(
-  "Method" = c(paste0("CC(", D, ", ", W, ")"), paste0("Bayesian (", R, ")")),
-  "ARI" = c(
-    mcclust::arandi(labels, cm_pred),
-    mcclust::arandi(labels, psm_pred)
-  )
-)
+<!-- ```{r LP_consensusModelling, cache = TRUE} -->
+<!-- for (ii in seq(1, W)) { -->
+<!--   .mcmc <- callMixtureModel(lp_data, D, thin, type) -->
 
-knitr::kable(perf_df, caption = "ARI for long chain vs consensus clustering on log-poisson data", digits = 3)
+<!--   for (jj in seq(1, number_depths)) { -->
+<!--     curr_d <- D_considered[jj] -->
+<!--     sample_used <- samples_extracted[jj] -->
 
-```
+<!--     .alloc <- .mcmc$allocations[sample_used, ] -->
+<!--     .ll <- .mcmc$complete_likelihood[sample_used] -->
+<!--     .mass <- .mcmc$mass[sample_used] -->
+
+<!--     .lkl_entry <- data.frame( -->
+<!--       "Complete_log_likelihood" = .ll, -->
+<!--       "D" = curr_d, -->
+<!--       "Chain" = ii -->
+<!--     ) -->
+
+<!--     .mass_entry <- data.frame( -->
+<!--       "Mass" = .mass, -->
+<!--       "D" = curr_d, -->
+<!--       "Chain" = ii -->
+<!--     ) -->
+
+<!--     if (ii == 1) { -->
+<!--       allocations[[jj]] <- .alloc -->
+<!--       lkl_df <- .lkl_entry -->
+<!--       mass_df <- .mass_entry -->
+<!--     } else { -->
+<!--       allocations[[jj]] <- rbind(allocations[[jj]], .alloc) -->
+<!--       lkl_df <- rbind(lkl_df, .lkl_entry) -->
+<!--       mass_df <- rbind(mass_df, .mass_entry) -->
+<!--     } -->
+<!--   } -->
+<!-- } -->
+
+<!-- ``` -->
+
+<!-- ```{r LP_cms, cache=TRUE} -->
+
+<!-- cms <- vector("list", n_models) -->
+
+<!-- for (ii in seq(1, number_chains)) { -->
+<!--   curr_w <- W_considered[ii] -->
+<!--   chains_used <- seq(1, curr_w) -->
+
+<!--   for (jj in seq(1, number_depths)) { -->
+<!--     curr_cm_index <- (ii - 1) * number_depths + jj -->
+
+<!--     curr_d <- D_considered[jj] -->
+<!--     .cm <- makePSM(allocations[[jj]][chains_used, ]) -->
+<!--     row.names(.cm) <- colnames(.cm) <- row.names(lp_data) -->
+<!--     cms[[curr_cm_index]] <- .cm -->
+<!--   } -->
+<!-- } -->
+
+<!-- cc_lst <- list( -->
+<!--   "CMs" = cms, -->
+<!--   "likelihood_df" = lkl_df, -->
+<!--   "mass_df" = mass_df, -->
+<!--   "allocations" = allocations -->
+<!-- ) -->
+<!-- ``` -->
+
+<!-- ```{r LP_viz_cm, cache=TRUE} -->
+<!-- annotatedHeatmap(psms[[1]], labels, -->
+<!--   col_pal = simColPal(), -->
+<!--   my_breaks = defineBreaks(simColPal(), lb = 0), -->
+<!--   main = "PSM (chain 1) for log-poisson data annotated by true labelling", -->
+<!--   show_colnames = FALSE, -->
+<!--   show_rownames = FALSE -->
+<!-- ) -->
+
+<!-- annotatedHeatmap(cms[[n_models]], labels, -->
+<!--   col_pal = simColPal(), -->
+<!--   my_breaks = defineBreaks(simColPal(), lb = 0), -->
+<!--   main = "CM for log-poisson data annotated by true labelling", -->
+<!--   show_colnames = FALSE, -->
+<!--   show_rownames = FALSE -->
+<!-- ) -->
+
+<!-- cm_pred <- mcclust::maxpear(cms[[n_models]], max.k = 25)$cl -->
+<!-- psm_pred <- mcclust::maxpear(psms[[1]], max.k = 25)$cl -->
+
+<!-- perf_df <- data.frame( -->
+<!--   "Method" = c(paste0("CC(", D, ", ", W, ")"), paste0("Bayesian (", R, ")")), -->
+<!--   "ARI" = c( -->
+<!--     mcclust::arandi(labels, cm_pred), -->
+<!--     mcclust::arandi(labels, psm_pred) -->
+<!--   ) -->
+<!-- ) -->
+
+<!-- knitr::kable(perf_df, caption = "ARI for long chain vs consensus clustering on log-poisson data", digits = 3) -->
+
+<!-- ``` -->

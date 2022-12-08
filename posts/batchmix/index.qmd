@@ -8,7 +8,7 @@ bibliography: batchmix.bib
 
 My R package, batchmix, finally landed on [CRAN](https://cran.r-project.org/web/packages/batchmix/index.html). This implements the models described in my paper [@Coleman2022BatchModel], mixture models aimed at accounting for batch effects.
 
-The model is very similar to the COMBAT algorithm of @JohnsonAdjustingbatcheffects2007, but infers batch effects and class at the same time. This makes the method semi-supervised as it uses the inferred labels to update class parameters. This offers some protection from unequal representation of class across batches which is nice.
+The model is very similar to the ComBat algorithm of @JohnsonAdjustingbatcheffects2007, but infers batch effects and class at the same time. This makes the method semi-supervised as it uses the inferred labels to update class parameters. This offers some protection from unequal representation of class across batches which is nice.
 
 This post will essentially recreate the vignette for the package showing how to use it.
 
