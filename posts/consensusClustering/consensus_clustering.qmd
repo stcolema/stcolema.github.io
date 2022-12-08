@@ -90,12 +90,12 @@ my_df <- my_data <- NULL
 group_IDs <- matrix(0, nrow = N, ncol = n_views)
 
 for (ii in seq(1, n_views)) {
-  .x <- generateSimulationDataset(K[ii],
-    N,
-    P[ii],
+  .x <- MDIr::generateSimulationDataset(K = K[ii],
+    N = N,
+    P = P[ii],
     delta_mu = delta_mu[ii],
     pi = pi[[ii]],
-    p_n = P_n
+    P_n = P_n
   )
 
   .data <- scale(.x$data)

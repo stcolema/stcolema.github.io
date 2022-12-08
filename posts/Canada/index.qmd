@@ -7,7 +7,9 @@ categories: [Bayes]
 
 ## Summary
 
-I attended the BAyesian Young Statisticians Meeting (BAYSM) and the International Society for Bayesian Analysis in Montreal in June. BAYSM was great, despite intense jet lag, though the keynotes were three people who have all made significant contributions to (among other things) model-based clustering: Adrian Raftery, Sylvia Frühwirth-Schnatter and Amy Herring. Also, a number of people I'd met at the BNP meeting in Cyprus were in attendence which was a delight. This was two days and less than 100 people. ISBA was a much more intense affair. I think about 600 people attended in the end? It lasted the week and had very long and full days. Though I also only started sleeping correctly in the last two days, so my sleep deficit was pretty strong, so I might be overstating it.
+I attended the BAyesian Young Statisticians Meeting (BAYSM) and the International Society for Bayesian Analysis in Montreal in June. 
+
+BAYSM was great, despite intense jet lag, though the keynotes were three people who have all made significant contributions to (among other things) model-based clustering: Adrian Raftery, Sylvia Frühwirth-Schnatter and Amy Herring. Also, a number of people I'd met at the BNP meeting in Cyprus were in attendence which was a delight. This was two days and less than 100 people. ISBA was a much more intense affair. I think about 600 people attended in the end? It lasted the week and had very long and full days. Though I also only started sleeping correctly in the last two days, so my sleep deficit was pretty strong, so I might be overstating it.
 
 ## BAYSM
 
