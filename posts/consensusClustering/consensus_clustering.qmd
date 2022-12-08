@@ -226,14 +226,17 @@ psm <- makePSM(.mcmc$allocations)
 row.names(psm) <- colnames(psm) <- row.names(my_data)
 
 # Create the heatmap of the PSM
-pheatmap::pheatmap(psm,
+row_order <- findOrder(psm)
+pheatmap::pheatmap(psm[row_order, row_order],
   color = simColPal(),
   breaks = defineBreaks(simColPal(), lb = 0),
   annotation_row = anno_row,
   annotation_colors = ann_colours,
   main = "Example PSM annotated by clusterings",
   show_rownames = FALSE,
-  show_colnames = FALSE
+  show_colnames = FALSE,
+  cluster_rows = FALSE,
+  cluster_cols = FALSE
 )
 
 psm_df <- prepSimilarityMatricesForGGplot(psms)
@@ -246,7 +249,12 @@ psm_df |>
     low = "#FFFFFF",
     high = "#146EB4"
   ) +
-  labs(title = "PSMs for initial chains with common ordering")
+  labs(title = "PSMs for initial chains with common ordering") +
+  theme(axis.text.x=element_blank(),
+    axis.ticks.x=element_blank(),
+    axis.text.y=element_blank(),
+    axis.ticks.y=element_blank() 
+  )
 ```
 
 
@@ -426,6 +434,11 @@ cm_df |>
   scale_fill_gradient(
     low = "#FFFFFF",
     high = "#146EB4"
+  ) +
+  theme(axis.text.x=element_blank(),
+    axis.ticks.x=element_blank(),
+    axis.text.y=element_blank(),
+    axis.ticks.y=element_blank() 
   )
 ```
 
