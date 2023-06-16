@@ -63,13 +63,16 @@ In this post I want to show how to use consensus clustering. First, let's genera
 suppressPackageStartupMessages(library(mdiHelpR))
 
 # For mixture models
-suppressPackageStartupMessages(library(MDIr))
+suppressPackageStartupMessages(library(mdir))
 
 suppressPackageStartupMessages(library(magrittr))
 suppressPackageStartupMessages(library(patchwork))
 suppressPackageStartupMessages(library(tidyr))
 suppressPackageStartupMessages(library(ggplot2))
 suppressPackageStartupMessages(library(dplyr))
+
+# For the Cranmer-von Mises test
+suppressPackageStartupMessages(library(twosamples))
 
 set.seed(1)
 setMyTheme()
@@ -90,7 +93,7 @@ my_df <- my_data <- NULL
 group_IDs <- matrix(0, nrow = N, ncol = n_views)
 
 for (ii in seq(1, n_views)) {
-  .x <- MDIr::generateSimulationDataset(K = K[ii],
+  .x <- mdir::generateSimulationDataset(K = K[ii],
     N = N,
     P = P[ii],
     delta_mu = delta_mu[ii],
@@ -575,10 +578,10 @@ I am interested in how well the consensus clustering approximates a well-behaved
 N_2d <- 200
 P_2d <- 2
 
-data_2d <- MDIr::generateGaussianDataset(cluster_means = c(-2, 2), 
+data_2d <- generateGaussianDataset(cluster_means = c(-2, 2), 
   std_dev = c(1, 1), 
-  n = N_2d, 
-  p = P_2d, 
+  N = N_2d, 
+  P = P_2d, 
   pi = c(0.5, 0.5)
 )
 
@@ -588,11 +591,11 @@ W <- 1000
 alloc_mat <- matrix(0, nrow = W, ncol = N_2d)
 
 for(w in seq(1, W)) {
-  .mcmc <- callMixtureModel(data_2d$data, D, thin = D, type = "G", K = 50)
+  .mcmc <- mdir::callMixtureModel(data_2d$data, D, thin = D, type = "G", K = 50)
   alloc_mat[w, ] <- .mcmc$allocations[2 , ]
 }
 
-cm <- createSimilarityMat(alloc_mat)
+cm <- mdir::createSimilarityMat(alloc_mat)
 
 n_chains <- 7
 R <- 2.5e4
@@ -602,8 +605,8 @@ burn <- 1e4
 psms <- list()
 
 for(ii in seq(1, n_chains)) {
-  .mcmc <- callMixtureModel(data_2d$data, R, thin, type = "G", K = 50)
-  psms[[ii]] <- createSimilarityMat(.mcmc$allocations[-seq(1, burn / thin), ])
+  .mcmc <- mdir::callMixtureModel(data_2d$data, R, thin, type = "G", K = 50)
+  psms[[ii]] <- mdir::createSimilarityMat(.mcmc$allocations[-seq(1, burn / thin), ])
 }
 
 psms[[n_chains + 1]] <- cm
