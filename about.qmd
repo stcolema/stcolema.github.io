@@ -1,12 +1,9 @@
 ---
-title: "Me"
+title: "Stephen Coleman"
 image: profile.jpg
 about:
   template: jolla
   links:
-    - icon: twitter
-      text: Twitter
-      href: https://twitter.com/stcolema1
     - icon: linkedin
       text: LinkedIn
       href: https://www.linkedin.com/in/stephen-coleman-03432184/
@@ -16,4 +13,4 @@ about:
 
 ---
 
-I am a PhD student in Cambridge working with Bayesian model-based clustering methods.
+I work with Bayesian model-based clustering methods.
