@@ -3,10 +3,10 @@
     "listing": "/index.html",
     "items": [
       "/posts/consensusClustering/consensus_clustering.html",
+      "/posts/mdir/mdir.html",
       "/posts/Canada/index.html",
       "/posts/batchmix/index.html",
-      "/posts/mdir/mdir.html",
-      "/posts/mdir/clustering_count_data.html"
+      "/posts/ClusteringCountData/clustering_count_data.html"
     ]
   }
 ]
