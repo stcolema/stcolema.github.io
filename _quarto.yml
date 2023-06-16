@@ -4,17 +4,15 @@ project:
 execute:
   freeze: auto
 website:
-  title: "Barefoot Bayes"
+  title: "Updating Priors"
   site-url: https://stcolema.github.io/
-  description: "Adventures in barefoot running, Bayesian stats and coffee"
+  description: "Bayesian model-based clustering"
   image: onyx_ball.jpg
   navbar:
     right:
       - about.qmd
       - icon: github
         href: https://github.com/stcolema
-      - icon: twitter
-        href: https://twitter.com/stcolema1
 format:
   html:
     theme:
