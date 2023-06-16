@@ -7,7 +7,7 @@ website:
   title: "Updating Priors"
   site-url: https://stcolema.github.io/
   description: "Bayesian model-based clustering"
-  image: onyx_ball.jpg
+  image: chaffinch.jpg
   navbar:
     right:
       - about.qmd
