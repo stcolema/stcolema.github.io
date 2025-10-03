@@ -1,0 +1,25 @@
+---
+title: "Bayesian Inference and Variational Autoencoders"
+date: 2025-01-15
+categories: [Bayes, Machine Learning]
+description: "From Bayes' rule to VAEs: understanding variational inference for deep generative models"
+---
+
+This post explores how Variational Autoencoders connect classical Bayesian inference to modern deep learning. Starting from Bayes' rule and moving through the Evidence Lower Bound (ELBO) derivation, I cover the reparameterization trick, amortized inference, and practical implementation considerations.
+
+## Formats
+
+-   [**Read as article**](article.html) - Full explanation with detailed derivations
+-   [**View slides**](slides.html) - Presentation format from my lab meeting
+
+The article version is recommended for careful study with all mathematical details. The slides provide a visual overview suitable for quick reference.
+
+## Key Topics Covered
+
+-   Why Bayesian inference matters for biological data
+-   From conjugate priors to intractable posteriors
+-   Deriving the Evidence Lower Bound (ELBo)
+-   The reparameterization trick for backpropagation
+-   Amortized variational inference in VAEs
+-   Change of variables and normalizing flows
+-   Applications to single-cell genomics
