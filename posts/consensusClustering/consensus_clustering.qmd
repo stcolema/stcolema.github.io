@@ -1,7 +1,7 @@
 ---
 title: "Circumventing poor mixing in Bayesian model-based clustering"
 editor: visual
-data: 2022-08-01
+date: 2022-08-01
 categories: [Bayes]
 bibliography: cc.bib
 ---
@@ -220,7 +220,6 @@ ari_df |>
   labs(title = "ARI between rth sampled partition and final sampled partition in each chains")
 ```
 
-
 These long chains have stopped exploring new clusterings almost instantly. Two chains do one large change several thousand iterations into the sampler, but all chains find a partition similar to the final sampled partition within 1,000 iteration. The mass parameter takes awhile to converge, but this is sampled via Metropolis-Hastings, so this makes sense.
 
 ```{r long_chains_psms}
@@ -259,7 +258,6 @@ psm_df |>
     axis.ticks.y=element_blank() 
   )
 ```
-
 
 These PSMs also show why nested $\hat{R}$ and coupling don't work for clustering. These methods assume that the different chains can eventually reach similar places; this is unlikely to happen in any reasonable length of time in even as low-dimensional an example as this (70 features; hardly low-dimensional in many settings, but that's one of the joys of 'omics). These PSMs essentially binary, suggesting the same partition is sampled repeatedly; only chains 7 and 8 appear to capture any variety in the clusterings.
 
@@ -568,7 +566,6 @@ mean_abs_diff_df |>
   ggthemes::scale_color_colorblind()
 ```
 
-
 # How Bayesian are we?
 
 I am interested in how well the consensus clustering approximates a well-behaved chain. Let's investigate this in a dataset where mixing will not be an issue. We'll run a number of chains on a two-dimensional dataset with well separate clusters and compare this to a consensus clustering of the same dataset. In both the short and long chains we will use longer chains than we need.
@@ -680,46 +677,75 @@ It appears that consensus clustering can describe the posterior distribution qui
 <!-- Lets check this using data generated like so: -->
 
 <!-- \begin{align} -->
+
 <!-- Y_n &\sim Pois(\lambda_k), \\ -->
+
 <!-- \epsilon_n &\sim \mathcal{N}(0, 1), \\ -->
+
 <!-- X_n &= log(Y_n) + \epsilon_n. -->
+
 <!-- \end{align} -->
 
 <!-- ```{r logpoisson_data} -->
 
-
 <!-- generateLogPoissonData <- function(lambdas, N, P, labels, -->
+
 <!--                                    row_names = paste0("Person_", seq(1, N)), -->
+
 <!--                                    col_names = paste0("Gene_", seq(1, P))) { -->
+
 <!--   classes <- unique(labels) -->
+
 <!--   gen_data <- matrix(0, N, P) -->
+
 <!--   for (p in seq(1, P)) { -->
+
 <!--     lambdas_p <- sample(lambdas) -->
+
 <!--     for (k in classes) { -->
+
 <!--       class_inds <- which(labels == k) -->
+
 <!--       n_k <- length(class_inds) -->
+
 <!--       gen_data[class_inds, p] <- log(1.0 + rpois(n_k, lambdas_p[k])) + rnorm(n_k) -->
+
 <!--     } -->
+
 <!--   } -->
+
 <!--   row.names(gen_data) <- row_names -->
+
 <!--   colnames(gen_data) <- col_names -->
+
 <!--   gen_data <- scale(gen_data) -->
+
 <!--   gen_data -->
+
 <!-- } -->
 
 <!-- N <- 1250 -->
+
 <!-- P <- 5 -->
+
 <!-- K <- 5 -->
+
 <!-- rates <- c(5, 15, 25, 40, 75) -->
+
 <!-- class_weights <- c(0.4, 0.2, 0.2, 0.1, 0.1) -->
+
 <!-- labels <- sample(seq(1, K), size = N, replace = TRUE, prob = class_weights) -->
 
 <!-- lp_data <- generateLogPoissonData(rates, N, P, labels) -->
 
 <!-- annotatedHeatmap(lp_data, labels,  -->
+
 <!--   show_rownames = FALSE,  -->
+
 <!--   show_colnames = FALSE,  -->
+
 <!--   main = "Log-Poisson data" -->
+
 <!-- ) -->
 
 <!-- ``` -->
@@ -729,63 +755,95 @@ It appears that consensus clustering can describe the posterior distribution qui
 <!-- ```{r LP_long_chains, cache=TRUE} -->
 
 <!-- n_chains <- 3 -->
+
 <!-- R <- 10000 -->
+
 <!-- thin <- 50 -->
+
 <!-- type <- "G" -->
+
 <!-- iterations_initial <- seq(0, R, thin) -->
 
 <!-- n_samples <- floor(R / thin) + 1 -->
+
 <!-- type <- "G" -->
 
 <!-- psms <- lp_mcmc <- vector("list", n_chains) -->
+
 <!-- likelihood_df <- matrix(0, nrow = n_samples - 1, ncol = n_chains) -->
+
 <!-- colnames(likelihood_df) <- paste0("Chain", seq(1, n_chains)) -->
 
 <!-- ari_mat <- concentration_df <- matrix(0, nrow = n_samples, ncol = n_chains) -->
+
 <!-- colnames(ari_mat) <- colnames(concentration_df) <- paste0("Chain", seq(1, n_chains)) -->
 
 <!-- ensemble_psm <- matrix(0, nrow = N, ncol = N) -->
 
 <!-- for (ii in seq(1, n_chains)) { -->
+
 <!--   lp_mcmc[[ii]] <- .mcmc <- callMixtureModel(lp_data, R, thin, type) -->
+
 <!--   likelihood_df[, ii] <- .mcmc$complete_likelihood[-1] -->
+
 <!--   concentration_df[, ii] <- .mcmc$mass -->
+
 <!--   ari_mat[, ii] <- apply(.mcmc$allocations, 1, function(x) {mcclust::arandi(x, .mcmc$allocations[n_samples, ])}) -->
+
 <!--   .psm <- makePSM(lp_mcmc[[ii]]$allocations) -->
+
 <!--   row.names(.psm) <- colnames(.psm) <- row.names(lp_data) -->
+
 <!--   psms[[ii]] <- .psm -->
+
 <!--   ensemble_psm <- ensemble_psm + .psm -->
+
 <!-- } -->
 
 <!-- lp_psm_df <- prepSimilarityMatricesForGGplot(psms) -->
 
 <!-- lp_psm_df |> -->
+
 <!--   ggplot(aes(x = x, y = y, fill = Entry)) + -->
+
 <!--   geom_tile() + -->
+
 <!--   facet_wrap(~Chain) + -->
+
 <!--   scale_fill_gradient( -->
+
 <!--     low = "#FFFFFF", -->
+
 <!--     high = "#146EB4" -->
+
 <!--   ) + -->
+
 <!--   labs(title = "PSMs for log-poisson data") -->
+
 <!-- ``` -->
 
-
-
 <!-- ```{r LP_consensusClustering} -->
+
 <!-- D_considered <- c(50, 100, 250, 500) -->
+
 <!-- D <- max(D_considered) -->
+
 <!-- number_depths <- length(D_considered) -->
 
 <!-- W_considered <- c(25, 50, 100, 200) -->
+
 <!-- W <- max(W_considered) -->
+
 <!-- number_chains <- length(W_considered) -->
 
 <!-- models <- expand.grid(D_considered, W_considered) -->
+
 <!-- colnames(models) <- c("Depth", "Width") -->
+
 <!-- n_models <- nrow(models) -->
 
 <!-- thin <- 50 -->
+
 <!-- iterations <- seq(0, D, thin) -->
 
 <!-- allocation_list <- consensus_chains <- vector("list", W) -->
@@ -797,43 +855,69 @@ It appears that consensus clustering can describe the posterior distribution qui
 <!-- allocations <- vector("list", length(D_considered)) -->
 
 <!-- # account for saving of 0th iterations -->
+
 <!-- samples_extracted <- (D_considered / thin) + 1 -->
+
 <!-- ``` -->
 
 <!-- ```{r LP_consensusModelling, cache = TRUE} -->
+
 <!-- for (ii in seq(1, W)) { -->
+
 <!--   .mcmc <- callMixtureModel(lp_data, D, thin, type) -->
 
 <!--   for (jj in seq(1, number_depths)) { -->
+
 <!--     curr_d <- D_considered[jj] -->
+
 <!--     sample_used <- samples_extracted[jj] -->
 
 <!--     .alloc <- .mcmc$allocations[sample_used, ] -->
+
 <!--     .ll <- .mcmc$complete_likelihood[sample_used] -->
+
 <!--     .mass <- .mcmc$mass[sample_used] -->
 
 <!--     .lkl_entry <- data.frame( -->
+
 <!--       "Complete_log_likelihood" = .ll, -->
+
 <!--       "D" = curr_d, -->
+
 <!--       "Chain" = ii -->
+
 <!--     ) -->
 
 <!--     .mass_entry <- data.frame( -->
+
 <!--       "Mass" = .mass, -->
+
 <!--       "D" = curr_d, -->
+
 <!--       "Chain" = ii -->
+
 <!--     ) -->
 
 <!--     if (ii == 1) { -->
+
 <!--       allocations[[jj]] <- .alloc -->
+
 <!--       lkl_df <- .lkl_entry -->
+
 <!--       mass_df <- .mass_entry -->
+
 <!--     } else { -->
+
 <!--       allocations[[jj]] <- rbind(allocations[[jj]], .alloc) -->
+
 <!--       lkl_df <- rbind(lkl_df, .lkl_entry) -->
+
 <!--       mass_df <- rbind(mass_df, .mass_entry) -->
+
 <!--     } -->
+
 <!--   } -->
+
 <!-- } -->
 
 <!-- ``` -->
@@ -843,53 +927,87 @@ It appears that consensus clustering can describe the posterior distribution qui
 <!-- cms <- vector("list", n_models) -->
 
 <!-- for (ii in seq(1, number_chains)) { -->
+
 <!--   curr_w <- W_considered[ii] -->
+
 <!--   chains_used <- seq(1, curr_w) -->
 
 <!--   for (jj in seq(1, number_depths)) { -->
+
 <!--     curr_cm_index <- (ii - 1) * number_depths + jj -->
 
 <!--     curr_d <- D_considered[jj] -->
+
 <!--     .cm <- makePSM(allocations[[jj]][chains_used, ]) -->
+
 <!--     row.names(.cm) <- colnames(.cm) <- row.names(lp_data) -->
+
 <!--     cms[[curr_cm_index]] <- .cm -->
+
 <!--   } -->
+
 <!-- } -->
 
 <!-- cc_lst <- list( -->
+
 <!--   "CMs" = cms, -->
+
 <!--   "likelihood_df" = lkl_df, -->
+
 <!--   "mass_df" = mass_df, -->
+
 <!--   "allocations" = allocations -->
+
 <!-- ) -->
+
 <!-- ``` -->
 
 <!-- ```{r LP_viz_cm, cache=TRUE} -->
+
 <!-- annotatedHeatmap(psms[[1]], labels, -->
+
 <!--   col_pal = simColPal(), -->
+
 <!--   my_breaks = defineBreaks(simColPal(), lb = 0), -->
+
 <!--   main = "PSM (chain 1) for log-poisson data annotated by true labelling", -->
+
 <!--   show_colnames = FALSE, -->
+
 <!--   show_rownames = FALSE -->
+
 <!-- ) -->
 
 <!-- annotatedHeatmap(cms[[n_models]], labels, -->
+
 <!--   col_pal = simColPal(), -->
+
 <!--   my_breaks = defineBreaks(simColPal(), lb = 0), -->
+
 <!--   main = "CM for log-poisson data annotated by true labelling", -->
+
 <!--   show_colnames = FALSE, -->
+
 <!--   show_rownames = FALSE -->
+
 <!-- ) -->
 
 <!-- cm_pred <- mcclust::maxpear(cms[[n_models]], max.k = 25)$cl -->
+
 <!-- psm_pred <- mcclust::maxpear(psms[[1]], max.k = 25)$cl -->
 
 <!-- perf_df <- data.frame( -->
+
 <!--   "Method" = c(paste0("CC(", D, ", ", W, ")"), paste0("Bayesian (", R, ")")), -->
+
 <!--   "ARI" = c( -->
+
 <!--     mcclust::arandi(labels, cm_pred), -->
+
 <!--     mcclust::arandi(labels, psm_pred) -->
+
 <!--   ) -->
+
 <!-- ) -->
 
 <!-- knitr::kable(perf_df, caption = "ARI for long chain vs consensus clustering on log-poisson data", digits = 3) -->

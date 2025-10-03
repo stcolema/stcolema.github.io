@@ -1,7 +1,7 @@
 ---
 title: "Clustering count data"
 editor: visual
-data: 2022-06-01
+date: 2022-06-01
 categories: [Clustering]
 ---
 
@@ -209,7 +209,7 @@ Note that standardising has not impacted how well-separated the groups in the da
 
 In terms of separating out the subpopulations, it appears that the $\log$-transform has worked most effectively for the first two variables, but does not succeed with the sigmoidal data. This reminds us that a single transform might not be appropriate for an entire dataset; however, many datasets are too large to check each feature manually, this is simply to make the point that we often lose some signal and minimising this is only so feasible.
 
-We will now attempt to infer the latent clustering labels using mixture models. I use the ``Mclust`` function from the ``mclust`` package and the ``mvnormalmixEM`` from ``mixtools`` to create Gaussian mixture models. We will look at the clustering predicted for the data using ``pheatmap``. 
+We will now attempt to infer the latent clustering labels using mixture models. I use the `Mclust` function from the `mclust` package and the `mvnormalmixEM` from `mixtools` to create Gaussian mixture models. We will look at the clustering predicted for the data using `pheatmap`.
 
 I create some labels for the sigmoidal data to keep track of the tails - we hope these are allocated correctly and are probably the hardest sub-populations to untangle for the $\log$-transformed data. These labels are based on which tertiles the sigmoidal data falls into and is intended as a rough guide of how well the models deconstruct the sigmoidal data.
 
@@ -229,7 +229,7 @@ row.names(annotation_row) <- row.names(my_data)
 
 ## Model fitting
 
-Now attempt to fit models. I find that ``mixtools`` is less robust to ``mclust`` (struggles to solve the same datasets, even with the `hclust` initialisation). For this reason I comment out the code for fitting the `mixtools` model.
+Now attempt to fit models. I find that `mixtools` is less robust to `mclust` (struggles to solve the same datasets, even with the `hclust` initialisation). For this reason I comment out the code for fitting the `mixtools` model.
 
 ```{r model_fit}
 model_functions <- c(
@@ -287,7 +287,7 @@ for (i in 1:n_models) {
 }
 ```
 
-We can now inspect the model using several different visualisations. We can investigate the optimal number of components under the Bayesian Information Criterion (BIC) and we can look at the clusterings as defined by pairs of variables. I will look at the models defined on the scaled data and the ``log``-transformed data. The BIC vs $k$ plot also shows which of the possible types of covariance structure allowed by ``Mclust`` is optimal (this is the difference models listed and plotted).
+We can now inspect the model using several different visualisations. We can investigate the optimal number of components under the Bayesian Information Criterion (BIC) and we can look at the clusterings as defined by pairs of variables. I will look at the models defined on the scaled data and the `log`-transformed data. The BIC vs $k$ plot also shows which of the possible types of covariance structure allowed by `Mclust` is optimal (this is the difference models listed and plotted).
 
 ```{r inspect_models}
 summary(model_out[[1]][[2]])
@@ -299,11 +299,11 @@ plot(model_out[[1]][[3]], what = "classification")
 plot(model_out[[1]][[3]], what = "BIC")
 ```
 
-We can see that by using a vector of possible components (the input ``G = 2:15`` in the call to ``Mclust``), we have captured the optimal value. This is the global maximum in the plot comparing BIC to number of components for each model allowed by ``Mclust``. One thing to notice here is that the two models do agree on the optimal number of components (8), but that this is not expected to occurr, particularly for datasets of greater dimension. Another point is that the type of model that best fits the scaled data is the "EVE" model in comparison to the "VVV" model. This is a simpler model where each cluster has more restrictions on its parameters - thus the EVE model is easier to run (this is worth remembering if ``log``-transformed data demands to complex a model computationally). 
+We can see that by using a vector of possible components (the input `G = 2:15` in the call to `Mclust`), we have captured the optimal value. This is the global maximum in the plot comparing BIC to number of components for each model allowed by `Mclust`. One thing to notice here is that the two models do agree on the optimal number of components (8), but that this is not expected to occurr, particularly for datasets of greater dimension. Another point is that the type of model that best fits the scaled data is the "EVE" model in comparison to the "VVV" model. This is a simpler model where each cluster has more restrictions on its parameters - thus the EVE model is easier to run (this is worth remembering if `log`-transformed data demands to complex a model computationally).
 
-In the plots comparing clusterings across variables, we can see that the model defined on the ``log``-transformed data separates the two sub-populations in $Count_1$ and $Count_2$ with much greater confidence than the model defined on the standardised data. One can also see that $Count_3$, which has no sub-population structure, is not contributing significantly to the cluster allocaitons - the data is pretty uniformly distributed across the axis defined by $Count_3$, no clear partitions emerging. One can see that the sigmoidal structure in $Count_4$ is captured quie well by the ``log`` model.
+In the plots comparing clusterings across variables, we can see that the model defined on the `log`-transformed data separates the two sub-populations in $Count_1$ and $Count_2$ with much greater confidence than the model defined on the standardised data. One can also see that $Count_3$, which has no sub-population structure, is not contributing significantly to the cluster allocaitons - the data is pretty uniformly distributed across the axis defined by $Count_3$, no clear partitions emerging. One can see that the sigmoidal structure in $Count_4$ is captured quie well by the `log` model.
 
-## Results 
+## Results
 
 Let us now inspect the clustering inferred I ignore the original data as the scaling makes inspecting the data unfeasible.
 
@@ -378,5 +378,4 @@ knitr::kable(ari_mat, digits = 3)
 
 ## Summary
 
-We see that from the Gaussian mixture models perspective the original and standardised are interchangeable, leading to identical inference. Both datasets lead to a surprisingly similar clustering to the log-transformed  data; 0.7 is not a low ARI. Furthermore, we can see in the annotated heatmaps that a large source of the contention is that one cluster found in the log-transformed data is considered as two separate groups in the original (cluster 6 in the log-transformed inference approximately captures clusters 6 and 5 from the other point estimates), and conversely cluster 8 in the original data splits into two clusters in the log-transformed data. Deciding which of these is more useful, or if we should use 7 or 9 clusters rather then 8 involves further thought and ideally conversation with a domain expert.
-
+We see that from the Gaussian mixture models perspective the original and standardised are interchangeable, leading to identical inference. Both datasets lead to a surprisingly similar clustering to the log-transformed data; 0.7 is not a low ARI. Furthermore, we can see in the annotated heatmaps that a large source of the contention is that one cluster found in the log-transformed data is considered as two separate groups in the original (cluster 6 in the log-transformed inference approximately captures clusters 6 and 5 from the other point estimates), and conversely cluster 8 in the original data splits into two clusters in the log-transformed data. Deciding which of these is more useful, or if we should use 7 or 9 clusters rather then 8 involves further thought and ideally conversation with a domain expert.

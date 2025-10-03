@@ -1,7 +1,7 @@
 ---
 title: "mdir: Bayesian multi-omics clustering"
 editor: visual
-data: 2023-03-01
+date: 2023-03-01
 categories: [Bayes]
 ---
 
@@ -13,39 +13,27 @@ Multiple Dataset Integration (**MDI**), is a multi-omics method proposed by Kirk
 
 ## Mixture models
 
-Let $X=(X_1, \ldots, X_N)$ be the observed data, with $X_n = [X_{n, 1}, \ldots, X_{n,P}]^\top$ for each item being considered, where each observation has $P$ variables. We wish to model the data using a mixture of densities:
-\begin{align}
-	p(X_n | \theta = \{\theta_1, \ldots, \theta_K\}, \pi) &= \sum_{k=1}^K \pi_k f(X_n | \theta_k)
-\end{align}
-independently for each $n = 1, \ldots, N$. Here, $f(\cdot)$ is a probability density function such as the Gaussian density function or the categorical density function, and each component has its own weight, $\pi_k$, and set of parameters, $\theta_k$. The component weights are restricted to the unit simplex, i.e., $\sum_{k=1}^K \pi_k = 1$. To capture the discrete structure in the data, we introduce an allocation variable, $c=[c_1, \ldots, c_N]^\top, c_n \in [1, K] \subset \mathbb{N}$, to indicate which component a sample was drawn from, introducing conditional independence between the components,
-\begin{align}
-	p(c_n = k) &= \pi_k, \\
-	p(X_n | c_n = k, \theta_k) &= f(X_n | \theta_k).
-\end{align}
-The joint model can then be written
-\begin{align}
-	p(X, c, K, \pi, \theta) &= p(X | c, \pi, K, \theta) p(\theta | c, \pi, K) p(c | \pi, K) p(\pi | K) p(K).
-\end{align}
-We assume conditional independence between certain parameters such that the model reduces to
-\begin{align}
-	p(X, c, \theta, \pi, K) &=  p(\pi | K) p(\theta | K) p(K) \prod_{n=1}^N p(X_n | c_n, \theta_{c_n}) p (c_n | \pi).  \label{eqn:jointMixModel}
-\end{align}
-In terms of the hierarchical model this is:
-\begin{align}
+Let $X=(X_1, \ldots, X_N)$ be the observed data, with $X_n = [X_{n, 1}, \ldots, X_{n,P}]^\top$ for each item being considered, where each observation has $P$ variables. We wish to model the data using a mixture of densities: \begin{align}
+    p(X_n | \theta = \{\theta_1, \ldots, \theta_K\}, \pi) &= \sum_{k=1}^K \pi_k f(X_n | \theta_k)
+\end{align} independently for each $n = 1, \ldots, N$. Here, $f(\cdot)$ is a probability density function such as the Gaussian density function or the categorical density function, and each component has its own weight, $\pi_k$, and set of parameters, $\theta_k$. The component weights are restricted to the unit simplex, i.e., $\sum_{k=1}^K \pi_k = 1$. To capture the discrete structure in the data, we introduce an allocation variable, $c=[c_1, \ldots, c_N]^\top, c_n \in [1, K] \subset \mathbb{N}$, to indicate which component a sample was drawn from, introducing conditional independence between the components, \begin{align}
+    p(c_n = k) &= \pi_k, \\
+    p(X_n | c_n = k, \theta_k) &= f(X_n | \theta_k).
+\end{align} The joint model can then be written \begin{align}
+    p(X, c, K, \pi, \theta) &= p(X | c, \pi, K, \theta) p(\theta | c, \pi, K) p(c | \pi, K) p(\pi | K) p(K).
+\end{align} We assume conditional independence between certain parameters such that the model reduces to \begin{align}
+    p(X, c, \theta, \pi, K) &=  p(\pi | K) p(\theta | K) p(K) \prod_{n=1}^N p(X_n | c_n, \theta_{c_n}) p (c_n | \pi).  \label{eqn:jointMixModel}
+\end{align} In terms of the hierarchical model this is: \begin{align}
     X_n | c_n, \theta &\sim F(\theta_{c_n}), \\
     c_n | \pi &\sim \text{Multinomial}(\pi_1, \ldots, \pi_K), \\
     \pi_1, \ldots, \pi_K &\sim \text{Dirichlet}(\alpha / K, \ldots, \alpha / K), \\
     \theta_k &\sim G^{(0)},
-\end{align}
-where $F$ is the appropriate distribution (e.g., Gaussian, Categorical, etc.) and $G^{(0)}$ is some prior over the component parameters.
+\end{align} where $F$ is the appropriate distribution (e.g., Gaussian, Categorical, etc.) and $G^{(0)}$ is some prior over the component parameters.
 
 ## MDI
 
-MDI is a Bayesian integrative or multi-modal clustering method.  Signal sharing is defined by the prior on the cluster label of the $n^{th}$ observation in the $M$ modalities:
-\begin{align}
+MDI is a Bayesian integrative or multi-modal clustering method. Signal sharing is defined by the prior on the cluster label of the $n^{th}$ observation in the $M$ modalities: \begin{align}
 p(c_n^{(1)}, \ldots, c_n^{(M)} | \cdot) &= \prod_{m=1}^M \gamma^{(m)}_{c_n^{(m)}} \prod_{m = 1}^{M-1} \prod_{l = m + 1}^M (1 + \phi_{(m, l)} \mathbb{I} (c_n^{(m)} = c_n^{(l)})),
- \end{align}
-where $c_n^{(m)}$ is the label of the $n^{th}$ observation in the $m^{th}$ modality, $\gamma^{(m)}_{k}$ is the weight of the $k^{th}$ cluster in the $m^{th}$ modality, $\phi_{(m, l)}$ is the similarity between the clusterings of the $m^{th}$ and $l^{th}$ modalities and $\mathbb{I}(x)$ is the indicator function returning 1 if $x$ is true and 0 otherwise. Attractively, $\phi_{(m, l)}$ is inferred from the data and if there is no shared signal it will tend towards 0 giving us no dependency between these modalities. Thus each dataset will have independent clusters.
+ \end{align} where $c_n^{(m)}$ is the label of the $n^{th}$ observation in the $m^{th}$ modality, $\gamma^{(m)}_{k}$ is the weight of the $k^{th}$ cluster in the $m^{th}$ modality, $\phi_{(m, l)}$ is the similarity between the clusterings of the $m^{th}$ and $l^{th}$ modalities and $\mathbb{I}(x)$ is the indicator function returning 1 if $x$ is true and 0 otherwise. Attractively, $\phi_{(m, l)}$ is inferred from the data and if there is no shared signal it will tend towards 0 giving us no dependency between these modalities. Thus each dataset will have independent clusters.
 
 <!-- We use an overfitted mixture model \cite{rousseau2011asymptotic} to approximate a Dirichlet process mixture model \cite{ferguson1973bayesian, AntoniakMixturesDirichletProcesses1974, FergusonBayesianDensityEstimation1983, LoClassBayesianNonparametric1984} in each unsupervised modality, allowing inference of the number of clusters/classes present. If a number of classes are observed but one believes that additional classes might be present in the data one may use a semi-supervised overfitted mixture to detect novel classes as per Crook et al. \cite{Crook2020NoveltyDetection}. -->
 
@@ -245,7 +233,6 @@ We run 5 chains of MDI for 15,000 iterations. In the second and third datasets w
 
 We use a Gaussian density to model each class/cluster.
 
-
 ```{r mcmc, cache = TRUE}
 n_chains <- 10
 R <- 10000
@@ -292,7 +279,6 @@ row.names(psm_semi_2) <- row.names(gen_data$observed_data)
 psm_semi_3 <- mcmc_semi$allocations[[3]] |> createSimilarityMat()
 row.names(psm_semi_3) <- row.names(gen_data$observed_data)
 ```
-
 
 ```{r inspectOutput}
 annotatedHeatmap(psm_semi_1, gen_data$group_IDs,

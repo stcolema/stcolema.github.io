@@ -25,8 +25,8 @@ execute:
 author:
   - name: Stephen Coleman
     url: https://stcolema.github.io
-    affiliation: MRC Biostatistics Unit, University of Cambridge
-    affiliation-url: https://www.mrc-bsu.cam.ac.uk
+    affiliation: Cancer Early Detection Advanced Research Centre, OHSU
+    affiliation-url: https://www.ohsu.edu/knight-cancer-institute/cedar
     orcid: 0000-0002-2294-8869
 
 # Default fields for citation
