@@ -35,4 +35,4 @@ format:
     toc: true
     code-fold: false
     code-tools: true
-    css: styles.css
+    css: styles.scss
