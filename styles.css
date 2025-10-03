@@ -1,1 +1,296 @@
-/* css styles */
+/* ============================================================================
+   Custom Styles for Updating Priors
+   ============================================================================ */
+
+/* === Typography & Readability === */
+:root {
+  /* Colorblind-friendly accent colors */
+  --accent-blue: #0077BB;
+  --accent-orange: #EE7733;
+  --accent-teal: #009988;
+  --accent-magenta: #CC3377;
+
+  /* Better text colors */
+  --text-muted: #6c757d;
+  --code-bg: #f8f9fa;
+  --border-subtle: #e9ecef;
+}
+
+/* Improved body text */
+body {
+  font-feature-settings: "liga" 1, "kern" 1;
+  text-rendering: optimizeLegibility;
+}
+
+/* Better line height for reading */
+.quarto-title-block p,
+article p {
+  line-height: 1.7;
+  margin-bottom: 1.25rem;
+}
+
+/* Make headings more distinct */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+h2 {
+  border-bottom: 2px solid var(--border-subtle);
+  padding-bottom: 0.5rem;
+}
+
+h3 {
+  color: var(--accent-blue);
+}
+
+/* === Links === */
+a {
+  color: var(--accent-blue);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--accent-teal);
+  text-decoration: underline;
+}
+
+/* === Code Blocks === */
+/* Inline code */
+code:not(.sourceCode) {
+  background-color: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-size: 0.9em;
+  border: 1px solid var(--border-subtle);
+  color: var(--accent-magenta);
+}
+
+/* Code blocks */
+pre.sourceCode {
+  border-left: 3px solid var(--accent-blue);
+  border-radius: 4px;
+  padding: 1rem;
+  background-color: var(--code-bg);
+  overflow-x: auto;
+  margin: 1.5rem 0;
+}
+
+/* Code block styling */
+div.sourceCode {
+  margin: 1.5rem 0;
+}
+
+/* === Figures & Images === */
+figure {
+  margin: 2rem 0;
+}
+
+figcaption {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-top: 0.5rem;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+/* === Tables === */
+table {
+  margin: 1.5rem 0;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+thead {
+  background-color: var(--code-bg);
+  border-bottom: 2px solid var(--accent-blue);
+}
+
+th {
+  padding: 0.75rem;
+  font-weight: 600;
+  text-align: left;
+}
+
+td {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+tbody tr:hover {
+  background-color: var(--code-bg);
+}
+
+/* === Blockquotes === */
+blockquote {
+  border-left: 4px solid var(--accent-orange);
+  padding-left: 1.5rem;
+  margin: 1.5rem 0;
+  font-style: italic;
+  color: var(--text-muted);
+}
+
+/* === Lists === */
+ul, ol {
+  padding-left: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+li {
+  margin-bottom: 0.5rem;
+}
+
+/* === Callout boxes (if using Quarto callouts) === */
+.callout {
+  border-radius: 4px;
+  margin: 1.5rem 0;
+  padding: 1rem;
+  border-left: 4px solid;
+}
+
+.callout-note {
+  border-left-color: var(--accent-blue);
+  background-color: rgba(0, 119, 187, 0.05);
+}
+
+.callout-warning {
+  border-left-color: var(--accent-orange);
+  background-color: rgba(238, 119, 51, 0.05);
+}
+
+.callout-tip {
+  border-left-color: var(--accent-teal);
+  background-color: rgba(0, 153, 136, 0.05);
+}
+
+/* === Post listing improvements === */
+.quarto-listing-default .listing-item {
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 1.5rem 0;
+}
+
+.quarto-listing-default .listing-item:last-child {
+  border-bottom: none;
+}
+
+.listing-title {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.listing-description {
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.listing-categories {
+  margin-top: 0.5rem;
+}
+
+.listing-category {
+  background-color: var(--code-bg);
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  color: var(--accent-blue);
+  margin-right: 0.5rem;
+  display: inline-block;
+}
+
+/* === Navbar improvements === */
+.navbar {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* === Footer === */
+.nav-footer {
+  border-top: 1px solid var(--border-subtle);
+  margin-top: 3rem;
+  padding-top: 2rem;
+}
+
+/* === Dark theme adjustments === */
+html[data-bs-theme="dark"] {
+  --code-bg: #2d2d2d;
+  --border-subtle: #404040;
+  --text-muted: #adb5bd;
+}
+
+html[data-bs-theme="dark"] code:not(.sourceCode) {
+  background-color: var(--code-bg);
+  border-color: var(--border-subtle);
+  color: var(--accent-orange);
+}
+
+html[data-bs-theme="dark"] pre.sourceCode {
+  background-color: var(--code-bg);
+  border-left-color: var(--accent-teal);
+}
+
+html[data-bs-theme="dark"] thead {
+  background-color: var(--code-bg);
+}
+
+html[data-bs-theme="dark"] .listing-category {
+  background-color: var(--code-bg);
+  color: var(--accent-teal);
+}
+
+/* === Responsive adjustments === */
+@media (max-width: 768px) {
+  body {
+    font-size: 0.95rem;
+  }
+
+  h1 {
+    font-size: 1.75rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  pre.sourceCode {
+    padding: 0.75rem;
+  }
+}
+
+/* === Print styles === */
+@media print {
+  pre.sourceCode {
+    border: 1px solid #ddd;
+  }
+
+  a {
+    text-decoration: underline;
+  }
+
+  .navbar, .nav-footer {
+    display: none;
+  }
+}
+
+/* === Focus states for accessibility === */
+a:focus,
+button:focus {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+}
+
+/* === Smooth scrolling === */
+html {
+  scroll-behavior: smooth;
+}
+
+/* === Section anchors === */
+.header-section-number {
+  color: var(--accent-blue);
+  margin-right: 0.5rem;
+}

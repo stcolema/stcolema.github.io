@@ -7,15 +7,32 @@ website:
   title: "Updating Priors"
   site-url: https://stcolema.github.io/
   description: "Bayesian model-based clustering"
+  repo-url: https://github.com/stcolema/stcolema.github.io
+  repo-actions: [edit, issue]
+
+  page-footer:
+    left: "© 2025 Stephen Coleman"
+    right:
+      - icon: github
+        href: https://github.com/stcolema
+      - icon: linkedin
+        href: https://www.linkedin.com/in/stephen-coleman-03432184/
+
   image: onyx_ball.jpg
   navbar:
+    background: primary
+    search: true  # Enable search
     right:
       - about.qmd
       - icon: github
         href: https://github.com/stcolema
+
 format:
   html:
     theme:
-      light: lumen
-      dark: darkly
+      light: [lumen, styles.css]
+      dark: [darkly, styles.css]
+    toc: true
+    code-fold: false
+    code-tools: true
     css: styles.css
