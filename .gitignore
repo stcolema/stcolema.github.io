@@ -1,8 +1,22 @@
-.Rproj.user
+# Quarto
+/.quarto/
+/_site/
+/_freeze/
+
+# Auto-generated
+/listings.json
+/search.json
+/sitemap.xml
+
+# R
+/.Rproj.user/
 .Rhistory
 .RData
 .Ruserdata
 
-/.quarto/
-/_site/
+# System
+.DS_Store
+Thumbs.db
 
+# Project file (personal preference - some people commit this)
+*.Rproj
