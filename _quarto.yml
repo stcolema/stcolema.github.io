@@ -30,8 +30,8 @@ website:
 format:
   html:
     theme:
-      light: [lumen, styles.css]
-      dark: [darkly, styles.css]
+      light: [lumen, styles.scss]
+      dark: [darkly, styles.scss]
     toc: true
     code-fold: false
     code-tools: true
