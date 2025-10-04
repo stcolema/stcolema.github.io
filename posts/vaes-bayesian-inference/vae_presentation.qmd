@@ -24,7 +24,6 @@ format:
     fontsize: 28px
 ---
 
-
 ```{r setup, include=FALSE}
 library(ggplot2)
 library(dplyr)
@@ -40,74 +39,65 @@ knitr::opts_chunk$set(
 ```
 
 ::: {.content-visible when-format="html"}
-
 ## Overview
 
-This article explores the connection between Bayesian inference and Variational Autoencoders (VAEs). We begin with foundational Bayesian concepts, derive the Evidence Lower Bound (ELBO), and examine practical implementation details including the reparameterization trick and change-of-variables formula.
+This article connects classical Bayesian inference to modern deep learning through Variational Autoencoders (VAEs). We start with intuitive examples, derive the Evidence Lower Bound (ELBO), and explore practical implementation details. Along the way, we discuss when Bayesian methods are appropriate, connections to generalized Bayesian inference, and trade-offs between different modeling choices.
 
-**Related formats:** [View as slides](slides.html)
+**Prerequisites:** Basic probability (what's a distribution?), some calculus (derivatives, integrals), familiarity with neural networks helpful but not required.
+
+**Format options:** [View as slides](slides.html) | [Read as article](article.html)
 
 :::
 
-## Motivation
+## Why Bayesian Inference for Biology?
 
-High-dimensional biological data present unique challenges: sparsity, noise, and complex latent structure. Bayesian inference offers principled solutions through regularization, hierarchical modeling, and uncertainty quantification [@gelman2013bayesian]. Variational Autoencoders extend these principles to intractable posteriors through amortized variational inference [@kingma2013auto; @rezende2014stochastic].
+Biological data presents unique challenges: small samples, high noise, batch effects, and missing data. Point estimates like "the mutation rate is 0.23" don't capture our uncertainty about this number.
 
-::: {.content-visible when-format="revealjs"}
-***
-:::
+**What Bayesian inference provides:**
 
-## Why Bayesian? Distributions Over Point Estimates
-
-**Scenario:** Estimating mutation rates from limited samples.
-
-**Point estimate:** "The mutation rate is 0.23"
-
-- Single value
-- No uncertainty quantification
-
-**Distributional estimate (Bayesian):** "The mutation rate is likely between 0.18 and 0.28 (95% credible interval)"
-
-- Full posterior distribution
-- Explicit uncertainty
+1. **Uncertainty quantification**: Not just "mutation rate = 0.23" but "95% probability it's between 0.18-0.28"
+2. **Regularization**: Priors prevent overfitting when data is limited
+3. **Hierarchical modeling**: Share information across patients, tissues, or experiments
+4. **Missing data handling**: Treat unobserved variables probabilistically
 
 ::: {.callout-tip}
-## Key insight
-In genomics, small samples and measurement noise make uncertainty quantification critical. We need to know both our best estimate *and* our confidence in it [@gelman2013bayesian, Chapter 1].
+## When Bayesian methods shine
+Small samples + high noise + structured uncertainty = perfect fit for genomics, single-cell analysis, and clinical studies.
 :::
 
 ::: {.content-visible when-format="revealjs"}
 ***
 :::
 
-## Frequentist Properties of Bayesian Methods
+## A Motivating Example: Globe Tossing
 
-**Theoretical justification:** Under regularity conditions, for many models the Bayesian posterior concentrates around the frequentist estimator.
+Following @mcelreath2020statistical, imagine estimating Earth's water coverage by tossing a globe and recording whether your finger lands on water (W) or land (L).
 
-**Key results** [@ghosal2000convergence; @vandervaart1998asymptotic]:
+**Data:** 9 tosses → W L W W W L W L W (6 water, 3 land)
 
-1. **Posterior consistency:** As $n \to \infty$, posterior mass concentrates on neighborhoods of the true parameter
-2. **Convergence rates:** Posterior contracts at optimal minimax rates
-3. **Bernstein-von Mises theorem:** Posterior becomes asymptotically normal around the MLE
+**Question:** What proportion is water? How certain are we?
 
-::: {.callout-note}
-## Practical implication
-These results show Bayesian inference inherits frequentist optimality properties asymptotically, while providing exact finite-sample inference [@kleijn2012bernstein]. This bridges Bayesian and frequentist paradigms.
-:::
+. . .
 
-::: {.content-visible when-format="revealjs"}
-***
-:::
+**Point estimate:** 6/9 = 67%
 
-## Example: Globe Tossing
+But with only 9 tosses, we should be quite uncertain!
 
-Following @mcelreath2020statistical [Section 2.1], consider estimating Earth's water coverage by tossing a globe.
+---
 
-**Data:** 9 tosses yield W L W W W L W L W (6 water, 3 land)
+## Building a Generative Model
 
-**Model:** Let $p$ = proportion of water. For each toss: $\Pr(\text{Water} | p) = p$
+**Step 1: Assume a data-generating process**
 
-**Prior:** $p \sim \text{Beta}(1, 1)$ (uniform on $[0,1]$)
+Let $p$ = true proportion of water (unknown).
+For each toss: $\Pr(\text{Water} | p) = p$
+
+. . .
+
+**Step 2: Express prior beliefs**
+
+Before seeing data, what seems plausible?
+Prior: $p \sim \text{Beta}(1, 1)$ (uniform on [0,1])
 
 ```{r globe-prior, fig.height=4}
 theta <- seq(0, 1, length.out = 1000)
@@ -117,21 +107,21 @@ ggplot(df_prior, aes(x = theta, y = density)) +
   geom_line(linewidth = 1.5, color = "#E69F00") +
   geom_area(alpha = 0.3, fill = "#E69F00") +
   labs(
-    title = "Prior: Uniform Distribution",
+    title = "Prior: Before Any Data",
     subtitle = "All proportions equally plausible initially",
-    x = "Proportion Water (p)", y = "Density"
+    x = "Proportion Water (p)", y = "Plausibility"
   ) +
   theme_minimal(base_size = 14) +
   coord_cartesian(ylim = c(0, 2))
 ```
 
-::: {.content-visible when-format="revealjs"}
-***
-:::
+All values from 0 to 1 seem equally plausible initially.
 
-## Bayesian Updating: Sequential Learning
+---
 
-After first observation (W), higher values of $p$ become more plausible:
+## Bayesian Updating in Action
+
+After seeing W (first toss), higher values of $p$ become more plausible:
 
 ```{r first_toss}
 theta <- seq(0, 1, length.out = 1000)
@@ -156,19 +146,16 @@ ggplot(df_update1, aes(x = theta, y = density, color = type, linetype = type)) +
   scale_linetype_manual(values = c("Prior" = "dashed",
                                     "Likelihood (scaled)" = "dotted",
                                     "Posterior" = "solid")) +
-  labs(title = "Bayesian Update After First Observation",
-       x = "Proportion Water (p)", y = "Density") +
+  labs(title = "Learning From First Observation",
+       subtitle = "Seeing water makes higher p more plausible",
+       x = "Proportion Water (p)", y = "Plausibility") +
   theme_minimal(base_size = 14) +
   theme(legend.position = "top", legend.title = element_blank())
 ```
 
-::: {.content-visible when-format="revealjs"}
-***
-:::
+---
 
-## Final Posterior
-
-After all 9 observations, posterior concentrates around observed frequency:
+## After All 9 Tosses
 
 ```{r globe_toss_posterior}
 theta <- seq(0, 1, length.out = 1000)
@@ -201,286 +188,1270 @@ ggplot(df_final, aes(x = theta, y = density, color = type, fill = type)) +
   scale_fill_manual(values = c("Prior" = "#E69F00",
                                 "Posterior (6W, 3L)" = "#009E73")) +
   labs(title = "Posterior After 9 Observations",
-       x = "Proportion Water (p)", y = "Density") +
+       subtitle = "Our belief has concentrated around observed frequency",
+       x = "Proportion Water (p)", y = "Plausibility") +
   theme_minimal(base_size = 14) +
   theme(legend.position = "top", legend.title = element_blank())
 ```
 
-::: {.content-visible when-format="revealjs"}
-***
-:::
+**Key insight:** We get not just an estimate (64%), but quantified uncertainty (95% CI: [35%, 86%]).
 
-## Conjugacy and Its Limits
+---
 
-The Beta-Binomial model admits conjugate updates [@gelman2013bayesian, Section 2.4]:
+## Why This Worked: Conjugacy
 
+Beta prior + Binomial likelihood → Beta posterior
+
+This is **conjugacy**: posterior has same form as prior.
+
+**Update rule:**
 - Prior: $\text{Beta}(\alpha, \beta)$
-- Data: $k$ successes in $n$ trials
+- Data: $k$ successes in $n$ trials  
 - Posterior: $\text{Beta}(\alpha + k, \beta + n - k)$
 
-This yields closed-form inference with no iteration required.
+. . .
+
+**Result:** Instant, exact posterior. No iteration needed.
+
+. . .
 
 ::: {.callout-important}
-Most real models lack conjugacy. With complex likelihoods or hierarchical structure, posteriors become intractable [@blei2017variational]. This motivates approximate inference methods: MCMC [@robert2004monte] or variational inference [@jordan1999introduction].
+## The problem
+Most real biological models aren't conjugate! With complex likelihoods or latent variables, we can't write down the posterior analytically. This is where modern methods become necessary.
 :::
 
-::: {.content-visible when-format="revealjs"}
-***
-:::
+---
 
-## Bayes' Rule
+## When Conjugacy Breaks: Latent Variables
 
-$$p(\theta \mid x) = \frac{p(x \mid \theta) \, p(\theta)}{p(x)}$$
+Real biological data often has **unobserved** (latent) structure:
+- Cell types in scRNA-seq
+- True mutation rates varying across genome  
+- Batch effects mixing with biology
 
-where:
+**The mathematical problem:**
+$$p(x) = \int p(x, z) \, dz = \int p(x|z)p(z) \, dz$$
 
-- **Posterior** $p(\theta|x)$: updated beliefs after observing data
-- **Likelihood** $p(x|\theta)$: data probability given parameters
-- **Prior** $p(\theta)$: beliefs before data
-- **Marginal likelihood** $p(x) = \int p(x|\theta) p(\theta) d\theta$: normalizing constant
+This integral is usually intractable:
+- Can't enumerate all possible $z$
+- High-dimensional $z$ makes numerical integration impossible
+- No closed-form solution
 
-The marginal likelihood is key for model comparison but typically intractable in high dimensions [@bishop2006pattern, Section 3.4].
+**Two main solutions:**
+1. **MCMC**: Sample from posterior [@robert2004monte]
+2. **Variational Inference**: Approximate with simpler distribution [@jordan1999introduction]
 
-::: {.content-visible when-format="revealjs"}
-***
-:::
+---
 
-## Intractability with Latent Variables
-
-In complex models, latent variables $z$ make exact inference infeasible:
-
-$$p(x) = \int p(x, z) \, dz$$
-
-This integral is intractable when:
-
-- $z$ is high-dimensional
-- $p(x,z)$ is complex (neural networks)
-- No conjugacy exists
-
-**Solutions:**
-
-- MCMC: sample from posterior [@robert2004monte]
-- Variational inference: approximate with simpler distribution [@jordan1999introduction; @blei2017variational]
-
-::: {.content-visible when-format="revealjs"}
-***
-:::
-
-## Variational Inference Framework
-
-**Core idea:** Approximate intractable $p(z|x)$ with tractable $q_\phi(z|x)$ [@jordan1999introduction].
-
-Minimize divergence:
-$$\text{KL}(q_\phi(z|x) \,\|\, p(z|x)) = \int q_\phi(z|x) \log \frac{q_\phi(z|x)}{p(z|x)} dz$$
-
-**Challenge:** Requires knowing $p(z|x)$ to compute KL directly.
-
-**Solution:** Optimize equivalent objective (ELBO) that depends only on computable quantities [@blei2017variational].
-
-::: {.content-visible when-format="revealjs"}
-***
-:::
-
-## The Evidence Lower Bound (ELBO)
-
-**Derivation** [@jaakkola1996computing; @jordan1999introduction]:
-
-Start with log evidence:
-$$\log p(x) = \log \int q(z|x) \frac{p(x,z)}{q(z|x)} dz$$
-
-Apply Jensen's inequality:
-$$\log p(x) \geq \mathbb{E}_{q(z|x)}\left[\log \frac{p(x,z)}{q(z|x)}\right] = \text{ELBO}$$
-
-Expand using $p(x,z) = p(x|z)p(z)$:
-$$\text{ELBO} = \mathbb{E}_{q(z|x)}[\log p(x|z)] - \text{KL}(q(z|x) \,\|\, p(z))$$
+## Bayesian Inference: Theory vs Practice
 
 ::: {.callout-note}
-Maximizing ELBO simultaneously: (1) tightens bound on $\log p(x)$, and (2) minimizes $\text{KL}(q\|p)$ [@blei2017variational, Section 2.2].
+## What students learn
+Bayes' rule gives the posterior: $p(\theta|x) = \frac{p(x|\theta)p(\theta)}{p(x)}$
+
+Apply this formula → get inference.
 :::
 
-::: {.content-visible when-format="revealjs"}
-***
+. . .
+
+::: {.callout-warning}
+## What practitioners face
+Computing $p(x) = \int p(x|\theta)p(\theta)d\theta$ is usually impossible.
+
+Instead: approximate, sample, or both.
 :::
 
-## ELBO Components
+. . .
 
-$$\text{ELBO} = \underbrace{\mathbb{E}_{q(z|x)}[\log p(x|z)]}_{\text{Reconstruction}} - \underbrace{\text{KL}(q(z|x) \,\|\, p(z))}_{\text{Regularization}}$$
+**This gap explains why:**
+- Computational Bayesian inference is an active research area
+- We need sophisticated algorithms (MCMC, VI) 
+- Trade-offs exist between accuracy, speed, and ease of use
 
-**Reconstruction term:** How well does $z$ explain $x$?
+The rest of this article navigates these trade-offs for VAEs.
 
-- Encourages latent codes that generate accurate reconstructions
-- Estimated via Monte Carlo in practice
+---
 
-**KL regularization:** Keeps $q(z|x)$ close to prior $p(z)$
+## Asymptotic Properties: When Theory Meets Reality {.smaller}
 
-- Prevents overfitting
-- Often has closed form for Gaussian $q$ and $p$ [@kingma2013auto]
-- Encourages structured latent space
+Under restrictive conditions, Bayesian posteriors have well-studied asymptotic behavior [@ghosal2000convergence; @vandervaart1998asymptotic]. But these results require careful interpretation for practical use.
 
-::: {.content-visible when-format="revealjs"}
-***
+::: {.callout-note}
+## Classical results (under correct specification)
+- **Posterior consistency**: Posterior concentrates on data-generating parameter as $n \to \infty$
+- **Optimal contraction rates**: Concentration at minimax rates
+- **Bernstein-von Mises**: Posterior approximates normal around MLE
 :::
 
-## The Reparameterization Trick
+. . .
 
-**Problem:** Computing $\nabla_\phi \mathbb{E}_{q_\phi(z|x)}[\log p(x|z)]$ requires differentiating through sampling.
+::: {.callout-warning}
+## Critical caveats for practitioners
 
-**Naive approach (fails):**
-```
-z ~ q_φ(z|x)
-loss = log p(x|z)
-```
+**Model specification matters:**
+- Under misspecification, posterior concentrates around parameter *minimizing KL divergence* to truth, not truth itself [@kleijn2012bernstein]
+- "Best approximation in model class" ≠ actual data-generating process
 
-**Reparameterization** [@kingma2013auto; @rezende2014stochastic]:
+**Sieve priors need care:**
+- Coverage properties depend on "polished tail" conditions [@rousseau2020asymptotic]  
+- Automatic adaptation isn't guaranteed
 
-```
-ε ~ N(0,1)
-z = μ_φ(x) + σ_φ(x) * ε
-loss = log p(x|z)
-```
-
-Now $\nabla_\phi \mathbb{E}_\varepsilon[f(z)] = \mathbb{E}_\varepsilon[\nabla_\phi f(z)]$ using chain rule.
-
-::: {.content-visible when-format="revealjs"}
-***
+**VI adds approximation error:**
+- For sparse GP approximations, inducing variables must grow with $n$ to achieve minimax rates [@nieman2023uncertainty]
+- Variational bias compounds with model misspecification
 :::
 
-## Variational Autoencoders
+. . .
 
-VAEs implement amortized variational inference using neural networks [@kingma2013auto; @rezende2014stochastic]:
+::: {.callout-tip}
+## What this means for VAEs
+These results show Bayesian methods *can* achieve frequentist optimality under ideal conditions. In practice:
 
-**Encoder** $q_\phi(z|x)$: Maps data to approximate posterior parameters
+1. **Model misspecification** is ubiquitous (biology is complex!)
+2. **VI approximation** introduces additional bias beyond model error
+3. Posterior concentrates somewhere, but "where" depends on both model choice and approximation quality
 
-- Neural network outputs $\mu_\phi(x), \sigma_\phi(x)$
-- Amortizes inference across dataset [@margossian2024amortized]
-
-**Decoder** $p_\theta(x|z)$: Generative model
-
-- Neural network parameterizes $p(x|z)$
-
-**Training:** Maximize ELBO via stochastic gradient ascent on $\phi, \theta$
-
-::: {.content-visible when-format="revealjs"}
-***
+Don't expect theoretical guarantees to hold exactly, but principles (regularization, uncertainty) still provide value.
 :::
+
+---
+
+## Latent Variable Models
+
+Many biological processes involve **unobserved** (latent) variables that generate what we observe:
+
+**Examples:**
+- Cell type (latent) generates expression pattern (observed)
+- True mutation rate (latent) generates observed mutations
+- Batch effect (latent) distorts biological signal (observed)
+
+**Formally**, a latent variable model specifies:
+$p(x, z) = p(x|z)p(z)$
+
+- $z$: latent variables (unobserved)
+- $x$: observed data
+- $p(z)$: prior over latent structure
+- $p(x|z)$: likelihood of data given latents
+
+. . .
+
+**The inference problem:** Given observed $x$, compute posterior $p(z|x) = \frac{p(x|z)p(z)}{p(x)}$
+
+This requires computing $p(x) = \int p(x|z)p(z)dz$ - usually intractable.
+
+. . .
+
+::: {.callout-note}
+## Deep latent variable models
+When $p(x|z)$ is parameterized by a neural network (the **decoder**), we call this a **deep** latent variable model. The "deep" refers to the decoder architecture, not the latent structure itself.
+:::
+
+---
 
 ## Amortized Inference
 
-**Traditional VI:** Optimize $q(z)$ separately for each datapoint [@blei2017variational]
+**Traditional variational inference:** For each datapoint $x_i$, run optimization:
+$q_i^* = \arg\min_q \text{KL}(q(z) \| p(z|x_i))$
 
-- $x_1$ → run optimization → $q^*(z|x_1)$
-- $x_2$ → run optimization → $q^*(z|x_2)$
-- Computationally expensive at test time
+Cost: Must optimize separately for every $x_i$.
 
-**Amortized VI (VAEs):** Learn inference network $q_\phi(z|x)$ once [@margossian2024amortized]
+. . .
 
-- Training: Optimize $\phi$ across full dataset
-- Test time: $x_{\text{new}}$ → instant $q_\phi(z|x_{\text{new}})$
+**Amortized inference** [@margossian2024amortized]: Learn a function that maps any $x$ to its approximate posterior:
+
+$q_\phi(z|x) \approx p(z|x)$
+
+where $\phi$ are parameters of an **inference network** (the **encoder**).
+
+. . .
+
+**Training:** Optimize $\phi$ across full dataset once:
+$\phi^* = \arg\min_\phi \mathbb{E}_{p_\text{data}(x)}[\text{KL}(q_\phi(z|x) \| p(z|x))]$
+
+**At test time:** For new $x_\text{new}$, simply evaluate $q_\phi(z|x_\text{new})$ (instant).
+
+. . .
 
 ::: {.callout-tip}
-Amortization trades training cost for test-time speed. The encoder learns to perform inference as a feedforward computation [@margossian2024amortized, Section 2].
+## When amortization works well [@margossian2024amortized]
+- Posteriors have consistent structure across datapoints
+- Large dataset (amortization cost amortized over many examples)
+- Need fast inference on new data
+
+**When it struggles:**
+- Posteriors vary wildly between datapoints
+- Complex posterior dependencies
+- Small datasets (not worth training cost)
+:::
+
+---
+
+## VAEs: Combining Deep Latent Variable Models with Amortized Inference
+
+**VAE = Bayesian generative model + amortized variational inference**
+
+::: {.columns}
+::: {.column width="48%"}
+**Generative model (Bayesian):**
+
+- Prior: $p(z) \sim \mathcal{N}(0, I)$
+- Likelihood: $p_\theta(x|z)$ 
+  - Parameterized by decoder network
+  - $\theta$ are decoder weights
+
+This specifies beliefs about data generation.
+:::
+
+::: {.column width="48%"}
+**Inference (amortized VI):**
+
+- Approximate posterior: $q_\phi(z|x)$
+  - Parameterized by encoder network  
+  - $\phi$ are encoder weights
+
+This implements approximate inference.
+:::
+:::
+
+. . .
+
+**Joint training:** Optimize both $\theta$ (generative model) and $\phi$ (inference) simultaneously:
+$\max_{\theta, \phi} \mathbb{E}_{p_\text{data}(x)}[\text{ELBO}_{\theta,\phi}(x)]$
+
+. . .
+
+::: {.callout-important}
+## Critical distinction
+The **Bayesian model** ($p(x|z), p(z)$) could be used with MCMC, mean-field VI, or other methods. VAEs are one **inference framework** for these models, characterized by:
+1. Using variational inference (approximate posterior)
+2. Amortizing inference across dataset (encoder network)
+3. Training generative and inference networks jointly
 :::
 
 ::: {.content-visible when-format="revealjs"}
 ***
 :::
+
+## VAE Architecture Diagram
+
+```{r vae-architecture, echo=FALSE, fig.height=6, fig.width=10}
+library(grid)
+library(gridExtra)
+
+# Create visualization of VAE architecture
+par(mar = c(0, 0, 2, 0))
+plot.new()
+
+# Title
+text(0.5, 0.98, "VAE Architecture: Generative Model + Inference Network", 
+     cex = 1.6, font = 2)
+
+# Observed data (left)
+rect(0.05, 0.45, 0.15, 0.65, col = "#E69F00", border = "black", lwd = 2)
+text(0.1, 0.55, "x\n(data)", cex = 1.1, font = 2)
+text(0.1, 0.38, "Observed\nExpression", cex = 0.9)
+
+# Encoder (Inference Network)
+arrows(0.15, 0.55, 0.23, 0.55, lwd = 3, length = 0.15, col = "#0077BB")
+rect(0.25, 0.35, 0.45, 0.75, col = "#56B4E9", border = "black", lwd = 2)
+text(0.35, 0.60, "Encoder q_φ(z|x)", cex = 1.1, font = 2)
+text(0.35, 0.50, "Inference Network", cex = 0.95)
+text(0.35, 0.43, "Outputs: μ_φ(x), σ_φ(x)", cex = 0.85)
+text(0.35, 0.28, "Neural Network\nParameters: φ", cex = 0.85, col = "darkblue")
+
+# Latent space
+arrows(0.45, 0.55, 0.53, 0.55, lwd = 3, length = 0.15, col = "#0077BB")
+rect(0.55, 0.45, 0.65, 0.65, col = "#009E73", border = "black", lwd = 2)
+text(0.6, 0.55, "z", cex = 1.4, font = 2)
+text(0.6, 0.38, "Latent\nState", cex = 0.9)
+
+# Decoder (Generative Model)
+arrows(0.65, 0.55, 0.73, 0.55, lwd = 3, length = 0.15, col = "#CC79A7")
+rect(0.75, 0.35, 0.95, 0.75, col = "#D55E00", border = "black", lwd = 2)
+text(0.85, 0.60, "Decoder p_θ(x|z)", cex = 1.1, font = 2)
+text(0.85, 0.50, "Generative Model", cex = 0.95)
+text(0.85, 0.43, "Outputs: distribution\nparameters", cex = 0.85)
+text(0.85, 0.28, "Neural Network\nParameters: θ", cex = 0.85, col = "darkred")
+
+# Reconstruction
+arrows(0.95, 0.55, 1.03, 0.55, lwd = 3, length = 0.15, col = "#CC79A7")
+text(1.08, 0.55, "x̂\n(recon)", cex = 1.1, font = 2)
+
+# Prior
+arrows(0.6, 0.18, 0.6, 0.43, lwd = 2, length = 0.12, col = "darkgreen")
+text(0.6, 0.12, "p(z) ~ N(0,I)\nPrior", cex = 0.95, col = "darkgreen", font = 2)
+
+# Component labels
+text(0.35, 0.85, "INFERENCE", cex = 1.1, col = "#0077BB", font = 2)
+text(0.35, 0.82, "Amortized VI", cex = 0.9, col = "#0077BB")
+
+text(0.85, 0.85, "GENERATIVE", cex = 1.1, col = "#CC79A7", font = 2)
+text(0.85, 0.82, "Bayesian Model", cex = 0.9, col = "#CC79A7")
+
+# ELBO components
+text(0.35, 0.18, "KL Regularization", cex = 1, col = "darkred", font = 2)
+text(0.35, 0.15, "KL(q_φ(z|x) || p(z))", cex = 0.85, col = "darkred")
+arrows(0.35, 0.20, 0.35, 0.30, lwd = 2, col = "darkred", length = 0.1)
+
+text(0.85, 0.18, "Reconstruction", cex = 1, col = "darkgreen", font = 2)
+text(0.85, 0.15, "E_q[log p_θ(x|z)]", cex = 0.85, col = "darkgreen")
+arrows(0.85, 0.20, 0.85, 0.30, lwd = 2, col = "darkgreen", length = 0.1)
+
+# Training note
+text(0.5, 0.04, "Training: Jointly optimize φ (encoder) and θ (decoder) to maximize ELBO", 
+     cex = 1, font = 3)
+```
+
+**Key components:**
+
+- **Encoder (blue):** Inference network $q_\phi(z|x)$ learns to map data → approximate posterior
+- **Decoder (orange):** Generative model $p_\theta(x|z)$ learns data distribution given latents
+- **Latent space (green):** Low-dimensional representation with prior $p(z) = \mathcal{N}(0,I)$
+- **ELBO terms:** KL keeps encoder outputs close to prior; reconstruction rewards decoder accuracy
+
+Both networks trained jointly, but serve distinct purposes in the overall framework.
+
+::: {.content-visible when-format="revealjs"}
+***
+:::
+
+
+## Variational Inference: The Core Idea
+
+Since exact posterior $p(z|x)$ is intractable, **approximate** with simpler $q_\phi(z|x)$.
+
+**Goal:** Make $q_\phi(z|x)$ as close as possible to $p(z|x)$
+
+**How:** Minimize divergence between them:
+$$\text{KL}(q_\phi(z|x) \,\|\, p(z|x)) = \int q_\phi(z|x) \log \frac{q_\phi(z|x)}{p(z|x)} dz$$
+
+. . .
+
+::: {.callout-important}
+## The bootstrapping problem
+Computing this KL requires knowing $p(z|x)$ - the thing we can't compute!
+
+**Solution:** Optimize an equivalent objective (ELBO) that only uses computable quantities.
+:::
+
+---
+
+## Deriving the ELBO: Intuition First
+
+We want to maximize $\log p(x)$ (make data likely under model).
+
+**Key insight:** For *any* distribution $q(z|x)$:
+
+$$\log p(x) = \text{ELBO}(q) + \text{KL}(q \| p(z|x))$$
+
+where both terms are ≥ 0.
+
+. . .
+
+**This means:**
+1. ELBO is always a lower bound on $\log p(x)$
+2. Maximizing ELBO tightens this bound
+3. Simultaneously minimizes KL between $q$ and true posterior
+
+. . .
+
+**Why we can optimize this:**
+- ELBO uses only $q(z|x)$, $p(x,z)$, $p(z)$ - all computable!
+- Don't need intractable $p(z|x)$
+
+Now let's derive it formally...
+
+---
+
+## Deriving the ELBO: Step 1
+
+Start with what we want:
+$$\log p(x) = \log \int p(x, z) \, dz$$
+
+. . .
+
+Multiply inside the integral by $1 = \frac{q(z|x)}{q(z|x)}$:
+
+$$\log p(x) = \log \int q(z \mid x) \, \frac{p(x,z)}{q(z \mid x)} \, dz$$
+
+. . .
+
+::: {.callout-note}
+## Why this helps
+We've introduced our approximation $q$ while keeping the equation exact. Now we can work with expectations under $q$.
+:::
+
+---
+
+## Deriving the ELBO: Step 2
+
+Rewrite as expectation:
+$$\log p(x) = \log \, \mathbb{E}_{q(z \mid x)}\left[\frac{p(x,z)}{q(z \mid x)}\right]$$
+
+. . .
+
+Apply Jensen's inequality (log is concave):
+$$\log \mathbb{E}[Y] \geq \mathbb{E}[\log Y]$$
+
+. . .
+
+Therefore:
+$$\log p(x) \geq \mathbb{E}_{q(z \mid x)}\left[\log \frac{p(x,z)}{q(z \mid x)}\right] = \text{ELBO}$$
+
+This is the **Evidence Lower Bound**.
+
+---
+
+## Deriving the ELBO: Step 3
+
+Expand using $p(x,z) = p(x \mid z) p(z)$:
+
+$$
+\begin{align}
+\text{ELBO} &= \mathbb{E}_{q(z \mid x)}\left[\log \frac{p(x \mid z) p(z)}{q(z \mid x)}\right] \\
+&= \mathbb{E}_{q(z \mid x)}[\log p(x \mid z)] + \mathbb{E}_{q(z \mid x)}[\log p(z) - \log q(z \mid x)]
+\end{align}
+$$
+
+. . .
+
+Recognizing the KL divergence:
+$$\text{ELBO} = \mathbb{E}_{q(z \mid x)}[\log p(x \mid z)] - \text{KL}(q(z \mid x) \,\|\, p(z))$$
+
+. . .
+
+::: {.callout-tip}
+## Two interpretations
+1. **Lower bound perspective**: ELBO ≤ log evidence, maximizing tightens bound
+2. **VI perspective**: Maximizing ELBO minimizes KL to true posterior
+:::
+
+---
+
+## Understanding the ELBO Components
+
+$\text{ELBO} = \underbrace{\mathbb{E}_{q_\phi(z \mid x)}[\log p_\theta(x \mid z)]}_{\text{Reconstruction}} - \underbrace{\text{KL}(q_\phi(z \mid x) \,\|\, p(z))}_{\text{Regularization}}$
+
+. . .
+
+**Reconstruction term: "How well does the generative model explain data?"**
+- Sample $z \sim q_\phi(z|x)$ (encoder network outputs $\mu_\phi(x), \sigma_\phi(x)$)
+- Evaluate decoder likelihood: $\log p_\theta(x|z)$ 
+- Higher is better: generative model captures data structure
+
+. . .
+
+**KL regularization: "Keep approximate posterior close to prior"**
+- Prevents encoder from outputting arbitrarily complex distributions
+- Encourages smooth, structured latent space
+- Prior usually $p(z) = \mathcal{N}(0, I)$ (standard normal)
+
+. . .
+
+**The trade-off:**
+- Too much reconstruction focus → encoder overfits, complex $q_\phi$
+- Too much KL penalty → encoder ignores data, $q_\phi \approx p(z)$
+- Balance controlled by relative weights (β parameter)
+
+. . .
+
+::: {.callout-note}
+## Why both networks matter
+**Encoder** $q_\phi(z|x)$ appears in both terms (defines expectation and KL).
+**Decoder** $p_\theta(x|z)$ appears only in reconstruction.
+Training optimizes both $\phi$ and $\theta$ jointly to maximize ELBO.
+:::
+
+---
+
+## The Reparameterization Trick {.smaller}
+
+**Problem:** The encoder outputs parameters of $q_\phi(z|x)$. How do we get low-variance gradient estimates?
+
+**You CAN backpropagate through sampling** using the score function estimator (REINFORCE):
+$\nabla_\phi \mathbb{E}_{q_\phi(z|x)}[f(z)] = \mathbb{E}_{q_\phi(z|x)}[f(z) \nabla_\phi \log q_\phi(z|x)]$
+
+**The problem:** HIGH VARIANCE gradients (signal-to-noise ratio can be very poor).
+
+. . .
+
+**Reparameterization solution** [@kingma2013auto]: Express sampling as deterministic transformation of fixed noise.
+
+For Gaussian $q_\phi(z|x) = \mathcal{N}(\mu_\phi(x), \sigma^2_\phi(x))$:
+
+$z = \mu_\phi(x) + \sigma_\phi(x) \cdot \varepsilon, \quad \varepsilon \sim \mathcal{N}(0, I)$
+
+Now gradient is:
+$\nabla_\phi \mathbb{E}_{p(\varepsilon)}[f(g(\varepsilon,\phi))] = \mathbb{E}_{p(\varepsilon)}[\nabla_\phi f(g(\varepsilon,\phi))]$
+
+**Advantage:** LOWER VARIANCE because gradient is inside expectation, not multiplying the function.
+
+. . .
+
+```python
+# Score function (high variance)
+z ~ q_φ(z|x)
+grad_φ = f(z) * ∇_φ log q_φ(z|x)  # Gradient is noisy
+
+# Reparameterization (lower variance)  
+ε ~ N(0,1)
+z = μ_φ(x) + σ_φ(x) * ε
+grad_φ = ∇_φ f(z)  # Gradient through deterministic transform
+```
+
+. . .
+
+::: {.callout-note}
+## For non-Gaussian distributions
+If no reparameterization exists (e.g., discrete), use score function estimator with **control variates** for variance reduction, or alternative techniques like Gumbel-softmax [@jang2017categorical].
+:::
+
+---
+
+## Visualizing Reparameterization
+
+```{r reparam-visual, echo=FALSE, fig.height=5}
+set.seed(111)
+n <- 500
+mu <- 2
+sigma <- 1.5
+
+epsilon <- rnorm(n, 0, 1)
+z <- mu + sigma * epsilon
+
+df_reparam <- data.frame(
+  value = c(epsilon, z),
+  dist = rep(c("ε ~ N(0,1)", "z = μ + σε"), each = n)
+)
+
+df_reparam$dist <- factor(df_reparam$dist, 
+                          levels = c("ε ~ N(0,1)", "z = μ + σε"))
+
+ggplot(df_reparam, aes(value, fill = dist)) +
+  geom_histogram(bins = 40, alpha = 0.7, color = "white") +
+  facet_wrap(~dist, ncol = 1, scales = "free_y") +
+  geom_vline(data = data.frame(dist = "z = μ + σε", v = mu),
+             aes(xintercept = v), color = "red", linewidth = 1.2, linetype = "dashed") +
+  annotate("text", x = mu + 1, y = 40, label = "μ = 2", color = "red", size = 5) +
+  scale_fill_manual(values = c("ε ~ N(0,1)" = "skyblue", 
+                                "z = μ + σε" = "darkorange")) +
+  labs(title = "Reparameterization: Fixed Noise → Learnable Transform",
+       subtitle = "Same distribution, but now μ and σ are learnable!",
+       x = "Value", y = "Count") +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "none")
+```
+
+Both distributions are $\mathcal{N}(2, 1.5^2)$, but only second form allows gradient flow!
+
+---
+
+## What VAEs Are Really Doing
+
+::: {.callout-note}
+## The conceptual Bayesian ideal
+Given data $x$, instantly know exact posterior $p(z|x)$ over latents.
+
+This is what Bayes' rule gives us theoretically.
+:::
+
+. . .
+
+::: {.callout-warning}
+## The computational reality - two approximations
+
+**1. Variational approximation:** Can't compute exact $p(z|x)$, so approximate with simple family $q_\phi(z|x)$ (encoder network outputs Gaussian parameters)
+
+**2. Amortized approximation:** Instead of optimizing $q$ separately for each $x$, train encoder network $\phi$ that works for all $x$
+
+Both introduce approximation error ("amortization gap" [@margossian2024amortized])
+:::
+
+. . .
+
+**Training process:**
+$(\phi^*, \theta^*) = \arg\max_{\phi,\theta} \mathbb{E}_{p_\text{data}(x)}[\text{ELBO}_{\phi,\theta}(x)]$
+
+This takes many gradient steps to:
+- Learn good encoder (inference) parameters $\phi$
+- Learn good decoder (generative model) parameters $\theta$
+
+. . .
+
+::: {.callout-important}
+## Crucial distinction
+- **Conceptual update**: Bayes' rule (instant)
+- **VAE training**: Many iterations to learn amortized inference + generative model
+
+Each gradient step updates both encoder and decoder to jointly optimize ELBO.
+:::
+
+---
+
+## Analogy: Photograph vs Sketch
+
+::: {.columns}
+::: {.column width="48%"}
+**Bayesian Update = Photograph**
+
+📷 Click shutter → instant capture
+
+Complete image in one step.
+
+$$p(\theta|x) = \frac{p(x|\theta)p(\theta)}{p(x)}$$
+
+Data → Posterior (immediate)
+:::
+
+::: {.column width="48%"}
+**VAE Training = Sketch**
+
+✏️ Many strokes to build image
+
+Progressive refinement:
+
+$$q_0 \to q_1 \to q_2 \to \cdots \to q^*$$
+
+Many steps → good approximation
+:::
+:::
+
+. . .
+
+**The key difference:** Photos capture everything instantly. Sketches require many strokes to approximate the scene. VAE training is sketching, not photographing!
+
+---
+
+## Amortized Inference: The Key Efficiency Trick
+
+**Traditional variational inference:** Optimize approximate posterior for **each** datapoint separately
+
+- For each $x_i$: run optimization to find $q^*(z|x_i)$
+- Cost scales linearly with number of datapoints
+- Each new sample requires full optimization
+
+. . .
+
+**Amortized VI (VAE encoder):** Train inference network that works for **any** $x$
+
+- Training: Optimize encoder parameters $\phi$ across full dataset (once)
+- Test: New $x_\text{new}$ → evaluate $q_\phi(z|x_\text{new})$ (single forward pass)
+- Encoder network: $x \xrightarrow{\text{encoder}_\phi} (\mu_\phi(x), \sigma_\phi(x))$
+
+. . .
+
+::: {.callout-tip}
+## The amortization trick [@margossian2024amortized]
+Instead of optimizing separately for each $x$, learn parameters $\phi$ of an inference network. Training cost is amortized across the dataset; inference becomes a single forward pass.
+
+**Trade-off:** Amortization introduces approximation error (encoder may not be flexible enough for all posteriors), but enables scalability.
+:::
+
+. . .
+
+**When VAE amortization works well [@margossian2024amortized]:**
+- Large datasets (cost amortized over many examples)
+- Posteriors have consistent structure across datapoints
+- Need to perform inference repeatedly on new data
+- Computational budget favors fast test-time inference
+
+**When it struggles:**
+- Posteriors vary dramatically between datapoints  
+- Small datasets (training cost not justified)
+- High-stakes applications requiring most accurate inference possible
+
+---
+
+## Training vs Inference: Cost Comparison
+
+::: {.columns}
+::: {.column width="48%"}
+**Training Phase**
+
+```python
+for epoch in epochs:
+    for batch in dataset:
+        # Encoder: inference network
+        μ, σ = encoder_φ(x)
+        z = μ + σ * ε  # ε ~ N(0,I)
+        
+        # Decoder: generative model
+        recon = log p_θ(x|z)
+        
+        # ELBO components
+        kl = KL(q_φ(z|x) || p(z))
+        loss = -(recon - kl)
+        
+        # Update both networks
+        φ, θ ← optimize(loss)
+```
+
+- Trains encoder and decoder jointly
+- Cost amortized across full dataset
+- Done once (or periodically with new data)
+:::
+
+::: {.column width="48%"}
+**Inference Phase**
+
+```python
+# New datapoint arrives
+x_new = get_new_data()
+
+# Encoder: single forward pass
+μ, σ = encoder_φ(x_new)
+z ~ N(μ, σ²)
+
+# Decoder: generate reconstruction
+x_recon = decoder_θ(z)
+
+# Or: generate new samples
+z_new ~ N(0, I)  # Sample prior
+x_gen = decoder_θ(z_new)
+```
+
+- Single forward pass through encoder
+- No optimization needed
+- Scales to large datasets
+:::
+:::
+
+. . .
+
+::: {.callout-note}
+## What each network does
+**Encoder** (inference): Maps data → approximate posterior parameters $(\mu_\phi(x), \sigma_\phi(x))$
+
+**Decoder** (generative): Maps latent → data distribution parameters
+
+Training is more expensive (iterative optimization), but inference becomes efficient (one forward pass).
+:::
+
+---
 
 ## Monte Carlo Estimation in VAEs
 
-The ELBO contains expectations. For Gaussian VAEs with analytic KL:
+The ELBO contains expectations. For standard Gaussian VAE:
 
-$$\mathcal{L} = \mathbb{E}_{q(z|x)}[\log p(x|z)] - \text{KL}(q(z|x) \| p(z))$$
+$\text{ELBO} = \mathbb{E}_{q_\phi(z|x)}[\log p_\theta(x|z)] - \text{KL}(q_\phi(z|x) \| p(z))$
 
-**Reconstruction:** Estimated via Monte Carlo (typically $M=1$ sample [@kingma2013auto])
+. . .
 
-**KL term:** Computed exactly for Gaussian $q$ and $p$:
-$$\text{KL} = \frac{1}{2}\sum_i[\sigma_i^2 + \mu_i^2 - 1 - \log \sigma_i^2]$$
+**KL term:** Computed **exactly** when encoder is Gaussian
+$\text{KL} = \frac{1}{2}\sum_i[\sigma_i^2 + \mu_i^2 - 1 - \log \sigma_i^2]$
+
+- No sampling needed
+- Zero variance in gradient estimate
+- Works because both $q_\phi(z|x) = \mathcal{N}(\mu_\phi(x), \sigma^2_\phi(x))$ and $p(z) = \mathcal{N}(0, I)$ are Gaussian
+
+. . .
+
+**Reconstruction term:** Estimated via Monte Carlo
+- Encoder outputs $\mu_\phi(x), \sigma_\phi(x)$
+- Sample $z = \mu_\phi(x) + \sigma_\phi(x) \varepsilon$ where $\varepsilon \sim \mathcal{N}(0,I)$
+- Evaluate decoder: $\log p_\theta(x|z)$
+- Typically $M=1$ sample per datapoint
+
+. . .
 
 ::: {.callout-note}
-Single-sample estimates work because: (1) reparameterization gives low-variance gradients, and (2) mini-batch averaging provides implicit Monte Carlo [@kingma2013auto, Section 2.4].
+## Why M=1 works
+**Reparameterization** gives low-variance gradients through encoder parameters. **Mini-batch averaging** provides implicit Monte Carlo averaging across multiple datapoints. Together, single-sample estimates are sufficient [@kingma2013auto].
 :::
 
-::: {.content-visible when-format="revealjs"}
-***
+. . .
+
+**Implementation:**
+```python
+# Encoder forward pass
+μ, log_σ² = encoder_φ(x)
+
+# Reparameterization
+ε ~ N(0, I)
+z = μ + exp(0.5 * log_σ²) * ε
+
+# KL term (analytic)
+kl = 0.5 * sum(exp(log_σ²) + μ² - 1 - log_σ²)
+
+# Reconstruction (MC estimate)
+recon = log p_θ(x|z)  # Decoder likelihood
+
+# ELBO
+elbo = recon - kl
+```
+
+---
+
+## Important: Single Expectation, Not Nested MC
+
+**You might think:** Estimate each expectation separately
+
+```python
+# WRONG: Nested MC (don't do this!)
+for i in range(M_outer):
+    z = q.sample()
+    
+    # Nested estimation of KL (expensive!)
+    kl_samples = []
+    for j in range(M_inner):
+        z_kl = q.sample()
+        kl_samples.append(log_q(z_kl) - log_p(z_kl))
+    kl = mean(kl_samples)
+    
+    elbo[i] = log_p(x|z) - kl
+```
+
+. . .
+
+**Correct approach:** Single expectation over $q(z|x)$
+
+```python
+# CORRECT: Evaluate full integrand at each sample
+for i in range(M):
+    z = q.sample()
+    # One complete evaluation
+    elbo[i] = log_p(x|z) + log_p(z) - log_q(z|x)
+
+elbo_estimate = mean(elbo)
+```
+
+. . .
+
+::: {.callout-tip}
+We rewrote ELBO as **one** expectation. More efficient and lower variance than treating reconstruction and KL as separate!
 :::
 
-## Change of Variables Formula
+---
 
-When defining $z = t(\varepsilon)$ with $\varepsilon \sim s(\varepsilon)$, the density transforms as [@bishop2006pattern, Section 1.6.4]:
+## Change of Variables: Why It Matters {.smaller}
 
+When you transform a random variable, you must account for how volumes change.
+
+**Setup:** Let $\varepsilon \sim s(\varepsilon)$ (e.g., standard normal).
+Transform: $z = t(\varepsilon)$
+
+. . .
+
+**Key formula:** The density of $z$ is:
 $$\log q(z) = \log s(\varepsilon) - \log\left|\det\left(\frac{\partial t(\varepsilon)}{\partial \varepsilon}\right)\right|$$
 
-The Jacobian determinant accounts for volume changes under the transformation.
+The Jacobian determinant accounts for volume scaling.
 
-**Why it matters:**
+. . .
 
-- Standard Gaussian VAE: Jacobian is identity
-- Normalizing flows: Track cumulative Jacobian [@rezende2015variational]
-- Constrained distributions: Implicit in density formula
+::: {.callout-note}
+## When you need this
+**Don't worry if:**
+- Using standard Gaussian VAE (Jacobian is identity)
+- Using built-in distributions (PyTorch/Pyro compute automatically)
 
-::: {.content-visible when-format="revealjs"}
-***
+**Do think about it if:**
+- Implementing custom constrained latent spaces (Beta, Dirichlet)
+- Using normalizing flows
+- Debugging non-Gaussian VAEs
 :::
 
-## Normalizing Flows
+. . .
 
-**Extension:** Chain invertible transformations to build flexible distributions [@rezende2015variational]:
+**Physical intuition:** Stretch rubber band 2× → marks spread 2× apart → lower density per unit length!
 
-$$z = f_K \circ \cdots \circ f_1(\varepsilon), \quad \varepsilon \sim \mathcal{N}(0,I)$$
+---
 
-Density via change of variables:
-$$\log q(z) = \log \mathcal{N}(\varepsilon; 0, I) - \sum_{k=1}^K \log|\det J_{f_k}|$$
+## Generalized Bayes: Beyond Standard Posteriors {.smaller}
 
-**Key innovation:** Design $f_k$ with tractable Jacobians [@dinh2016density; @papamakarios2021normalizing].
+Standard Bayesian inference assumes well-specified likelihoods. But what if we want robustness to misspecification or different inference goals?
 
-Result: Expressive $q(z|x)$ while maintaining exact density evaluation.
+**Generalized Bayesian updating** [@bissiri2016general] extends Bayes' rule by replacing the likelihood with a general loss function:
 
-::: {.content-visible when-format="revealjs"}
-***
+$p_\text{gen}(\theta | x) \propto \exp(-\ell(x, \theta)) \pi(\theta)$
+
+where $\ell$ is a loss function (not necessarily negative log-likelihood).
+
+. . .
+
+**Key special cases:**
+
+1. **Standard Bayes**: $\ell(x, \theta) = -\log p(x|\theta)$
+2. **Tempered/Power posteriors**: $\ell(x, \theta) = -\beta \log p(x|\theta)$ [@holmes2017assigning]
+   - Controls trade-off between data and prior
+   - β < 1: downweight data (hotter, broader posterior)
+   - β > 1: upweight data (colder, sharper posterior)
+
+3. **Robust divergences**: $\ell$ based on Wasserstein, Hellinger, etc. [@jewson2018principles]
+   - Different sensitivity to outliers and tail behavior
+
+. . .
+
+::: {.callout-note}
+## Key insight for VAEs
+VAE variants (β-VAE, WAE) correspond to different choices in this framework. They're not arbitrary modifications - they target different divergences or use temperature to modify the likelihood-prior balance.
 :::
+
+---
+
+## The Rule of Three for VAEs
+
+**Knoblauch et al. (2022)** show VAE objectives need three choices:
+
+::: {.incremental}
+1. **Loss function**: What should we predict well?
+   - Standard: Negative log-likelihood
+   - Robust alternatives: Huber loss, quantile loss
+
+2. **Divergence**: How measure distribution mismatch?
+   - Standard VAE: KL divergence
+   - β-VAE: Weighted KL (β > 1)
+   - WAE: Wasserstein distance
+
+3. **Variational family**: What distributions can $q$ take?
+   - Diagonal Gaussian (most common)
+   - Full-rank Gaussian (more flexible)
+   - Normalizing flows (most expressive)
+:::
+
+. . .
+
+::: {.callout-important}
+Standard VAEs make specific choices that may not be optimal for all applications. Different scientific questions benefit from different combinations!
+:::
+
+---
+
+## β-VAE: Likelihood Tempering for Disentanglement
+
+**Problem:** Standard VAE often learns entangled representations - latent dimensions don't correspond to meaningful biological factors.
+
+. . .
+
+**β-VAE** [@higgins2017beta] modifies ELBO:
+$\mathcal{L}_\beta = \mathbb{E}_{q(z|x)}[\log p(x|z)] - \beta \, \text{KL}(q(z|x) \| p(z))$
+
+**Mathematical equivalence:** Dividing by β (doesn't change argmax):
+$\frac{\mathcal{L}_\beta}{\beta} = \frac{1}{\beta}\mathbb{E}_{q(z|x)}[\log p(x|z)] - \text{KL}(q(z|x) \| p(z))$
+
+This is **equivalent to VI with tempered likelihood** [@holmes2017assigning]:
+$p_{\text{β-VAE}}(z|x) \propto p(x|z)^{1/\beta} p(z)$
+
+. . .
+
+**Interpretation:**
+- β > 1: Down-weight likelihood relative to prior (cold temperature)
+- β < 1: Up-weight likelihood relative to prior (hot temperature)
+- Modifies ratio of reconstruction vs regularization contributions
+
+. . .
+
+**Why this induces disentanglement** [@burgess2018understanding]:
+- **Information bottleneck**: Higher β limits capacity through latent space
+- **Efficient coding**: Forces model to use dimensions efficiently
+- Discovers independent factors because that's most efficient compression
+
+. . .
+
+**Biological example:** In face images, might separate identity, expression, lighting, and pose into separate latent dimensions rather than mixing them.
+
+---
+
+## β-VAE Trade-off
+
+```{r beta_vae_tradeoff, echo=FALSE, fig.height=4.5}
+beta_values <- c(1, 2, 4, 8, 16)
+reconstruction <- c(0.95, 0.90, 0.80, 0.65, 0.45)
+disentanglement <- c(0.30, 0.50, 0.70, 0.85, 0.92)
+
+df <- data.frame(
+  beta = rep(beta_values, 2),
+  score = c(reconstruction, disentanglement),
+  metric = rep(c("Reconstruction Quality", "Disentanglement Score"), 
+               each = length(beta_values))
+)
+
+ggplot(df, aes(x = beta, y = score, color = metric)) +
+  geom_line(linewidth = 1.3) +
+  geom_point(size = 3.5) +
+  scale_x_log10(breaks = beta_values) +
+  scale_color_manual(values = c("Reconstruction Quality" = "#E69F00", 
+                                 "Disentanglement Score" = "#56B4E9")) +
+  labs(title = "β-VAE Trade-off",
+       subtitle = "Higher β improves disentanglement at cost of reconstruction",
+       x = "β (log scale)", y = "Score", color = "Metric") +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "top")
+```
+
+Choice of β depends on your priorities: perfect reconstruction vs interpretable factors.
+
+---
+
+## Wasserstein Autoencoders (WAE) {.smaller}
+
+**Motivation:** KL divergence penalizes tail mismatch heavily. What if we care more about typical cases?
+
+**WAE** [@tolstikhin2018wasserstein] minimizes:
+$$\mathcal{L}_\text{WAE} = \mathbb{E}_{q(z|x)}[c(x, G(z))] + \lambda D(Q_Z, P_Z)$$
+
+where $Q_Z = \int q(z|x) p_\text{data}(x) dx$ is the **aggregate posterior**.
+
+. . .
+
+**Key differences from VAE:**
+
+::: {.columns}
+::: {.column width="48%"}
+**VAE**
+- Per-sample KL penalty
+- Each $q(z|x)$ must match $p(z)$
+- Can be overly restrictive
+- Requires stochastic encoder
+:::
+
+::: {.column width="48%"}
+**WAE**
+- Aggregate distribution matching
+- Overall encoding distribution matches $p(z)$
+- More flexible per-sample
+- Allows deterministic encoder
+:::
+:::
+
+. . .
+
+::: {.callout-tip}
+## Practical advantages
+- Often better sample quality (lower FID scores)
+- More stable training
+- Easier to use alternative priors
+- More robust to outliers
+:::
+
+---
+
+## When to Choose What? {.smaller}
+
+Different applications benefit from different methods:
+
+::: {.columns}
+::: {.column width="48%"}
+**Standard VAE (β = 1)**
+
+✓ Likelihood well-specified (e.g., negative binomial for counts)
+
+✓ Want balance between reconstruction and regularization
+
+✓ Established architectures (scVI, etc.)
+
+**Examples:**
+- Single-cell RNA-seq (scVI)
+- Well-understood distributions
+- Standard generative modeling
+:::
+
+::: {.column width="48%"}
+**β-VAE (β ≠ 1)**
+
+✓ β > 1: Want disentangled, interpretable factors (accept worse reconstruction)
+
+✓ β < 1: Want better reconstruction (accept entangled representations)
+
+✓ Discovering independent biological factors
+
+**Examples:**
+- β > 1: Finding transcriptional programs, morphological features
+- β < 1: High-fidelity image generation
+- Exploratory analysis where interpretability matters
+:::
+:::
+
+. . .
+
+::: {.columns}
+::: {.column width="48%"}
+**WAE**
+
+✓ Care about typical cases more than extremes
+
+✓ Outliers or artifacts present
+
+✓ Want deterministic encoder
+
+**Examples:**
+- Medical imaging with artifacts
+- Robust to batch effects
+- Non-Gaussian or heavy-tailed data
+:::
+
+::: {.column width="48%"}
+**Practical note:**
+
+The mathematical equivalence between β-weighting and likelihood tempering means these are all special cases of tempered inference. Choice of β or divergence reflects your priorities: reconstruction quality vs interpretability vs robustness.
+:::
+:::
+
+
+---
+
+## MCMC vs VI: When to Use Each {.smaller}
+
+VAEs implement variational inference. When is this preferable to MCMC sampling?
+
+**VAEs/VI preferred when:**
+- Need to perform inference on many new samples repeatedly
+- Training cost acceptable for fast test-time inference
+- Approximate posteriors sufficient for downstream tasks
+- Want generative capabilities (sampling new data)
+
+**Example use case:** Cell type annotation
+- Train VAE on labeled reference (one-time cost)
+- Classify millions of new cells (each requires single forward pass)
+- MCMC would require running sampler separately for each cell
+
+. . .
+
+**MCMC preferred when:**
+- Analyzing dataset where per-sample computation is acceptable
+- Need guarantees about convergence to target distribution
+- Posterior has complex geometry where VI approximations demonstrably fail
+- Running inference once or infrequently (not repeatedly on new data)
+
+**Example use case:** Complex hierarchical model for clinical study
+- 50 patients with rich longitudinal data
+- Complex dependencies between parameters
+- Can afford computational cost per patient
+- Need accurate uncertainty quantification for decision-making
+
+. . .
+
+**Hybrid approaches** [@surjanovic2022parallel]:
+- Use VI to find good initialization
+- Then run parallel tempering from VI solution
+- Combines VI efficiency with MCMC theoretical guarantees
+
+. . .
+
+::: {.callout-warning}
+## No universal winner
+Choice depends on: dataset size, posterior complexity, computational budget, accuracy requirements, and downstream task. Both are valuable tools for different scenarios.
+:::
+
+---
 
 ## Applications to Single-Cell Genomics
 
-VAE-based models dominate single-cell RNA-seq analysis [@lopez2018deep]:
+VAE-based frameworks dominate single-cell RNA-seq analysis [@lopez2018deep]:
 
-**scVI architecture:**
+**scVI: The Bayesian model**
+- **Prior:** $z \sim \mathcal{N}(0, I)$ (cell state in low dimensions)
+- **Decoder (generative model):** $p_\theta(x|z)$ outputs parameters of zero-inflated negative binomial
+  - Matches count data structure (discrete, overdispersed)
+  - Neural network maps latent → gene expression parameters
+- **Data:** Gene expression counts (20,000 genes × millions of cells)
 
-- **Data:** Gene expression counts
-- **Latent $z$:** Cell state representation
-- **Likelihood:** Zero-inflated negative binomial
-- **Benefits:** Batch correction, imputation, uncertainty quantification
+. . .
 
-Similar principles extend to other omics data.
+**scVI: The inference framework**
+- **Encoder (amortized inference):** $q_\phi(z|x)$ outputs Gaussian parameters
+  - Neural network maps expression → latent distribution parameters
+  - Trained once on full dataset
+- **Benefits of amortization:** Process millions of cells in minutes
 
-::: {.content-visible when-format="revealjs"}
-***
+. . .
+
+**Why VAE for scRNA-seq:**
+
+::: {.incremental}
+1. **Principled generative model:** Negative binomial matches count distribution
+2. **Amortized inference:** Essential for millions of cells
+3. **Handles technical artifacts:** Batch effects modeled in latent space
+4. **Uncertainty quantification:** Posterior over latent states, not point estimates
+5. **Integrative:** Can process new cells without retraining
 :::
 
-## Summary
+. . .
 
-1. **Bayesian inference** provides principled uncertainty quantification [@gelman2013bayesian]
+::: {.callout-note}
+## Deep generative model
+scVI decoder is a deep neural network (multiple hidden layers). The "deep" is in the **generative model** (decoder), not the inference network, though the encoder is also typically deep.
+:::
 
-2. **Variational inference** approximates intractable posteriors via optimization [@jordan1999introduction; @blei2017variational]
+---
 
-3. **ELBO** lower bounds log evidence [@jaakkola1996computing]
+## Summary {.smaller}
 
-4. **Reparameterization** enables low-variance gradient estimation [@kingma2013auto]
+**VAEs = Bayesian generative model + Amortized variational inference**
 
-5. **VAEs** implement amortized inference using neural networks [@margossian2024amortized]
+::: {.incremental}
+1. **Latent variable models** specify beliefs about data generation [@gelman2013bayesian]
+   - Prior $p(z)$ and likelihood $p_\theta(x|z)$ define generative process
+   - Decoder network parameterizes $p_\theta(x|z)$ in deep models
+   - This model exists independent of inference method
 
-6. **Change of variables** ensures correct densities under transformations [@bishop2006pattern]
+2. **Variational inference** approximates intractable posteriors via optimization [@blei2017variational]
+   - Choose simple family $q_\phi(z|x)$ to approximate $p(z|x)$
+   - Maximize ELBO = minimize approximation error
+   - Alternative to MCMC for Bayesian inference
 
-::: {.content-visible when-format="html"}
-## Further Reading
+3. **Amortized inference** trains encoder network for efficient inference [@margossian2024amortized]
+   - Optimize encoder $\phi$ once across dataset
+   - Test-time inference becomes single forward pass
+   - Introduces "amortization gap" but enables scalability
 
+4. **ELBO** lower bounds log evidence and decomposes naturally [@jaakkola1996computing]
+   - Reconstruction: $\mathbb{E}_{q_\phi}[\log p_\theta(x|z)]$ (decoder quality)
+   - Regularization: $\text{KL}(q_\phi(z|x) \| p(z))$ (encoder constraint)
+   - Both encoder and decoder optimized jointly
+
+5. **Reparameterization trick** enables low-variance gradients [@kingma2013auto]
+   - Express sampling as deterministic transform of fixed noise
+   - Reduces gradient variance compared to score function estimator
+   - Essential for practical training
+
+6. **Generalized Bayes** shows VAE variants target different objectives [@bissiri2016general; @knoblauch2022optimization]
+   - β-VAE: Likelihood tempering for disentanglement [@higgins2017beta]
+   - WAE: Wasserstein distance for robustness [@tolstikhin2018wasserstein]
+   - Standard VAE: Forward KL minimization
+   - All are special cases of generalized Bayesian updating
+
+7. **Applications** require both components working together
+   - scVI: Negative binomial generative model + amortized inference [@lopez2018deep]
+   - Success depends on: appropriate likelihood, expressive encoder/decoder, sufficient data
+:::
+
+. . .
+
+::: {.callout-important}
+## The key distinction
+VAEs are an **inference framework** for Bayesian models, not the Bayesian model itself. The same generative model could be paired with MCMC, mean-field VI, or other inference methods. VAEs specifically combine neural network parameterization with amortized variational inference.
+:::
+
+---
+
+## Further Reading {.smaller}
+
+**VAE fundamentals:**
 - @kingma2013auto: Original VAE paper
+- @rezende2014stochastic: Alternative derivation via stochastic backprop
 - @blei2017variational: Comprehensive VI review
-- @margossian2024amortized: Theory of amortized inference
-- @papamakarios2021normalizing: Normalizing flows survey
-- @lopez2018deep: Application to single-cell transcriptomics
 
-**Formats:** [View as slides](slides.html)
-:::
+**Theory:**
+- @margossian2024amortized: When amortization works/fails
+- @rousseau2020asymptotic: Bayesian asymptotic theory for VI
+- @nieman2023uncertainty: Frequentist properties of variational approximations
+
+**Extensions:**
+- @higgins2017beta: β-VAE for disentanglement
+- @tolstikhin2018wasserstein: Wasserstein autoencoders
+- @papamakarios2021normalizing: Normalizing flows survey
+
+**Generalized Bayes:**
+- @bissiri2016general: General Bayesian updating framework
+- @jewson2018principles: Inference using divergence criteria
+- @knoblauch2022optimization: GVI and Rule of Three
+
+**Applications:**
+- @lopez2018deep: scVI for single-cell transcriptomics
+- @surjanovic2022parallel: Combining MCMC and VI
+
+---
 
 ## References
 
