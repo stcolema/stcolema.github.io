@@ -1,9 +1,11 @@
 ---
 title: "Bayesian Inference and Variational Autoencoders"
-subtitle: "From Bayes' Rule to Deep Generative Models"
-author: "Stephen Coleman"
+editor: visual
 date: 2025-01-15
-categories: [Bayes, Machine Learning, VAE]
+categories: 
+  - Bayes
+  - "Machine Learning"
+  - VAE
 bibliography: vae_presentation.bib
 citation: true
 format:
@@ -22,22 +24,29 @@ format:
     fontsize: 28px
 ---
 
+
 ```{r setup, include=FALSE}
 library(ggplot2)
 library(dplyr)
 library(tidyr)
 library(patchwork)
 
-knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, 
-                      fig.width = 8, fig.height = 5)
+knitr::opts_chunk$set(
+  echo = FALSE, 
+  warning = FALSE, 
+  message = FALSE, 
+  fig.width = 8, fig.height = 5
+)
 ```
 
 ::: {.content-visible when-format="html"}
+
 ## Overview
 
 This article explores the connection between Bayesian inference and Variational Autoencoders (VAEs). We begin with foundational Bayesian concepts, derive the Evidence Lower Bound (ELBO), and examine practical implementation details including the reparameterization trick and change-of-variables formula.
 
 **Related formats:** [View as slides](slides.html)
+
 :::
 
 ## Motivation
@@ -45,7 +54,7 @@ This article explores the connection between Bayesian inference and Variational 
 High-dimensional biological data present unique challenges: sparsity, noise, and complex latent structure. Bayesian inference offers principled solutions through regularization, hierarchical modeling, and uncertainty quantification [@gelman2013bayesian]. Variational Autoencoders extend these principles to intractable posteriors through amortized variational inference [@kingma2013auto; @rezende2014stochastic].
 
 ::: {.content-visible when-format="revealjs"}
----
+***
 :::
 
 ## Why Bayesian? Distributions Over Point Estimates
@@ -68,12 +77,12 @@ In genomics, small samples and measurement noise make uncertainty quantification
 :::
 
 ::: {.content-visible when-format="revealjs"}
----
+***
 :::
 
 ## Frequentist Properties of Bayesian Methods
 
-**Theoretical justification:** Under regularity conditions, Bayesian posteriors concentrate around the true parameter (from a frequentist perspective).
+**Theoretical justification:** Under regularity conditions, for many models the Bayesian posterior concentrates around the frequentist estimator.
 
 **Key results** [@ghosal2000convergence; @vandervaart1998asymptotic]:
 
@@ -87,7 +96,7 @@ These results show Bayesian inference inherits frequentist optimality properties
 :::
 
 ::: {.content-visible when-format="revealjs"}
----
+***
 :::
 
 ## Example: Globe Tossing
@@ -117,7 +126,7 @@ ggplot(df_prior, aes(x = theta, y = density)) +
 ```
 
 ::: {.content-visible when-format="revealjs"}
----
+***
 :::
 
 ## Bayesian Updating: Sequential Learning
@@ -154,7 +163,7 @@ ggplot(df_update1, aes(x = theta, y = density, color = type, linetype = type)) +
 ```
 
 ::: {.content-visible when-format="revealjs"}
----
+***
 :::
 
 ## Final Posterior
@@ -198,7 +207,7 @@ ggplot(df_final, aes(x = theta, y = density, color = type, fill = type)) +
 ```
 
 ::: {.content-visible when-format="revealjs"}
----
+***
 :::
 
 ## Conjugacy and Its Limits
@@ -216,7 +225,7 @@ Most real models lack conjugacy. With complex likelihoods or hierarchical struct
 :::
 
 ::: {.content-visible when-format="revealjs"}
----
+***
 :::
 
 ## Bayes' Rule
@@ -233,7 +242,7 @@ where:
 The marginal likelihood is key for model comparison but typically intractable in high dimensions [@bishop2006pattern, Section 3.4].
 
 ::: {.content-visible when-format="revealjs"}
----
+***
 :::
 
 ## Intractability with Latent Variables
@@ -254,7 +263,7 @@ This integral is intractable when:
 - Variational inference: approximate with simpler distribution [@jordan1999introduction; @blei2017variational]
 
 ::: {.content-visible when-format="revealjs"}
----
+***
 :::
 
 ## Variational Inference Framework
@@ -269,7 +278,7 @@ $$\text{KL}(q_\phi(z|x) \,\|\, p(z|x)) = \int q_\phi(z|x) \log \frac{q_\phi(z|x)
 **Solution:** Optimize equivalent objective (ELBO) that depends only on computable quantities [@blei2017variational].
 
 ::: {.content-visible when-format="revealjs"}
----
+***
 :::
 
 ## The Evidence Lower Bound (ELBO)
@@ -290,7 +299,7 @@ Maximizing ELBO simultaneously: (1) tightens bound on $\log p(x)$, and (2) minim
 :::
 
 ::: {.content-visible when-format="revealjs"}
----
+***
 :::
 
 ## ELBO Components
@@ -309,7 +318,7 @@ $$\text{ELBO} = \underbrace{\mathbb{E}_{q(z|x)}[\log p(x|z)]}_{\text{Reconstruct
 - Encourages structured latent space
 
 ::: {.content-visible when-format="revealjs"}
----
+***
 :::
 
 ## The Reparameterization Trick
@@ -333,7 +342,7 @@ loss = log p(x|z)
 Now $\nabla_\phi \mathbb{E}_\varepsilon[f(z)] = \mathbb{E}_\varepsilon[\nabla_\phi f(z)]$ using chain rule.
 
 ::: {.content-visible when-format="revealjs"}
----
+***
 :::
 
 ## Variational Autoencoders
@@ -352,7 +361,7 @@ VAEs implement amortized variational inference using neural networks [@kingma201
 **Training:** Maximize ELBO via stochastic gradient ascent on $\phi, \theta$
 
 ::: {.content-visible when-format="revealjs"}
----
+***
 :::
 
 ## Amortized Inference
@@ -373,7 +382,7 @@ Amortization trades training cost for test-time speed. The encoder learns to per
 :::
 
 ::: {.content-visible when-format="revealjs"}
----
+***
 :::
 
 ## Monte Carlo Estimation in VAEs
@@ -392,7 +401,7 @@ Single-sample estimates work because: (1) reparameterization gives low-variance 
 :::
 
 ::: {.content-visible when-format="revealjs"}
----
+***
 :::
 
 ## Change of Variables Formula
@@ -410,7 +419,7 @@ The Jacobian determinant accounts for volume changes under the transformation.
 - Constrained distributions: Implicit in density formula
 
 ::: {.content-visible when-format="revealjs"}
----
+***
 :::
 
 ## Normalizing Flows
@@ -427,7 +436,7 @@ $$\log q(z) = \log \mathcal{N}(\varepsilon; 0, I) - \sum_{k=1}^K \log|\det J_{f_
 Result: Expressive $q(z|x)$ while maintaining exact density evaluation.
 
 ::: {.content-visible when-format="revealjs"}
----
+***
 :::
 
 ## Applications to Single-Cell Genomics
@@ -444,7 +453,7 @@ VAE-based models dominate single-cell RNA-seq analysis [@lopez2018deep]:
 Similar principles extend to other omics data.
 
 ::: {.content-visible when-format="revealjs"}
----
+***
 :::
 
 ## Summary
